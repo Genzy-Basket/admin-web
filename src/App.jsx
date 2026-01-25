@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import ViewIngredients from "./pages/view_ingredients";
-import IngredientForm from "./pages/Ingredient_upload_form";
 import AdminLayout from "./pages/adminLayout";
 import ManageUsers from "./pages/manage_users";
 import CreateDishForm from "./pages/CreateDish";
 import ManageDish from "./pages/ManageDish";
-
+import { IngredientsProvider } from "./context/IngredientsContext";
+import ViewIngredients from "./pages/Ingrents/view_ingredients";
+import IngredientForm from "./pages/Ingrents/Ingredient_upload_form";
 function App() {
   return (
     <BrowserRouter>
@@ -16,10 +16,24 @@ function App() {
         {/* Admin Protected Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<div>Dashboard Stats Page</div>} />
-          <Route path="ingredients" element={<ViewIngredients />} />
+          <Route
+            path="ingredients"
+            element={
+              <IngredientsProvider>
+                <ViewIngredients />
+              </IngredientsProvider>
+            }
+          />
           <Route path="ingredients/add" element={<IngredientForm />} />
           <Route path="dishes" element={<ManageDish />} />
-          <Route path="dishes/add" element={<CreateDishForm />} />
+          <Route
+            path="dishes/add"
+            element={
+              <IngredientsProvider>
+                <CreateDishForm />
+              </IngredientsProvider>
+            }
+          />
           <Route path="manage-users" element={<ManageUsers />} />
           {/* Add more feature routes here */}
         </Route>

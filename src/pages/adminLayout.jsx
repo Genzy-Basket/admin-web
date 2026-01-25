@@ -6,7 +6,7 @@ const AdminLayout = () => {
   const location = useLocation();
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex max-h-screen bg-slate-50">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
         <div className="p-6 border-b border-slate-100">

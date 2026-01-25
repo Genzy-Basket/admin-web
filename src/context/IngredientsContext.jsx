@@ -12,15 +12,20 @@ export const IngredientsProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load ingredients globally on mount
+  // Load ingre	dients globally on mount
   const fetchIngredients = async () => {
     setLoading(true);
     try {
-      const data = await getAllIngredients();
-      setIngredients(data);
+      const response = await getAllIngredients();
+
+      const actualData = Array.isArray(response)
+        ? response
+        : response.data || [];
+
+      setIngredients(actualData);
     } catch (err) {
       setError("Failed to fetch ingredients");
-      console.error(err);
+      setIngredients([]); // Fallback to empty array so .map doesn't crash
     } finally {
       setLoading(false);
     }
@@ -83,7 +88,7 @@ export const useIngredients = () => {
   const context = useContext(IngredientsContext);
   if (!context) {
     throw new Error(
-      "useIngredients must be used within an IngredientsProvider"
+      "useIngredients must be used within an IngredientsProvider",
     );
   }
   return context;

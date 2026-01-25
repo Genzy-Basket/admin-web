@@ -7,8 +7,6 @@ import {
   CookingPot,
   Salad,
 } from "lucide-react";
-import ViewIngredients from "../pages/view_ingredients";
-import IngredientForm from "../pages/Ingredient_upload_form";
 
 export const adminRoutes = [
   {
