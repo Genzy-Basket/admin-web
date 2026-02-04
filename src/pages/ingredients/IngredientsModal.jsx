@@ -41,7 +41,7 @@ export const IngredientModal = ({ isOpen, onClose, onSelect, selectedIds }) => {
                   <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                     <img
                       src={ing.imageUrl}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover flex-shrink-0"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover shrink-0"
                       alt={ing.name}
                     />
                     <div className="min-w-0 flex-1">
@@ -55,7 +55,7 @@ export const IngredientModal = ({ isOpen, onClose, onSelect, selectedIds }) => {
                   </div>
                   <button
                     onClick={() => onSelect(ing)}
-                    className={`p-2 rounded-lg transition-all flex-shrink-0 ${
+                    className={`p-2 rounded-lg transition-all shrink-0 ${
                       isAdded
                         ? "bg-green-500 text-white"
                         : "bg-orange-100 text-orange-600 hover:bg-orange-200"

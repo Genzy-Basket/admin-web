@@ -84,7 +84,7 @@ const ManageUsers = () => {
             >
               {/* User Header */}
               <div className="flex items-start gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shrink-0">
                   {user.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">

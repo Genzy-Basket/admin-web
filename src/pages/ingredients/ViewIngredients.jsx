@@ -1,62 +1,116 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, X, Info, DollarSign, Package, Tag } from "lucide-react";
-import { ingredientApi } from "../../api/ingredientApi";
+import { useNavigate } from "react-router-dom";
+import { Info, Search, X, Filter, Delete, Trash } from "lucide-react";
 import { useIngredients } from "../../context/IngredientsContext";
-import { PageContainer, Badge, ActionButtons } from "../../components/shared";
-import {
-  Table,
-  TableHeader,
-  TableHeaderCell,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "../../components/shared/Table";
+import { PageContainer, Badge } from "../../components/shared";
+import { IngredientDetailsModal } from "./IngredientDetailsModal";
+
+const CATEGORIES = [
+  "all",
+  "vegetables",
+  "meat",
+  "fruits",
+  "dairy",
+  "coconut products",
+  "egg",
+  "snacks",
+  "bakery",
+  "oils",
+  "pulses",
+  "rice & grains",
+  "flours",
+];
 
 const ViewIngredients = () => {
-  const { ingredients, loading, refreshIngredients } = useIngredients();
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({});
+  const navigate = useNavigate();
+  const {
+    ingredients,
+    loading,
+    refreshIngredients,
+    deleteIngredient,
+    searchIngredients,
+    filterIngredients,
+  } = useIngredients();
+
   const [selectedIngredient, setSelectedIngredient] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [filterVeg, setFilterVeg] = useState(null); // null = all, true = veg, false = non-veg
+  const [displayedIngredients, setDisplayedIngredients] = useState([]);
 
   useEffect(() => {
     refreshIngredients();
   }, [refreshIngredients]);
 
+  // Apply search and filters
+  useEffect(() => {
+    let result = ingredients;
+
+    // Apply search
+    if (searchTerm.trim()) {
+      result = searchIngredients(searchTerm);
+    }
+
+    // Apply filters
+    const filters = {};
+    if (selectedCategory !== "all") {
+      filters.category = selectedCategory;
+    }
+    if (filterVeg !== null) {
+      filters.isVeg = filterVeg;
+    }
+
+    if (Object.keys(filters).length > 0) {
+      result = filterIngredients(filters);
+    }
+
+    setDisplayedIngredients(result);
+  }, [
+    ingredients,
+    searchTerm,
+    selectedCategory,
+    filterVeg,
+    searchIngredients,
+    filterIngredients,
+  ]);
+
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this?")) return;
+    if (!window.confirm("Are you sure you want to delete this ingredient?"))
+      return;
+
     try {
-      await ingredientApi.delete(id);
-      await refreshIngredients();
+      await deleteIngredient(id);
+      alert("Ingredient deleted successfully!");
     } catch (err) {
-      console.log(err);
-      alert("Delete failed");
+      console.error("Delete failed:", err);
+
+      // Better error handling
+      if (err.response?.status === 403) {
+        alert("Admin access required to delete ingredients");
+      } else if (err.response?.status === 401) {
+        alert("Please login as admin to continue");
+      } else if (err.response?.status === 404) {
+        alert("Ingredient not found");
+      } else {
+        alert(err.response?.data?.message || "Delete failed");
+      }
     }
   };
 
-  const startEdit = (item) => {
-    setEditingId(item._id);
-    setEditForm({ ...item });
+  const handleEdit = (id) => {
+    navigate(`/ingredients/update/${id}`);
   };
 
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditForm({});
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("all");
+    setFilterVeg(null);
   };
 
-  const handleUpdate = async () => {
-    try {
-      await ingredientApi.update(editingId, editForm);
-      await refreshIngredients();
-      setEditingId(null);
-      setEditForm({});
-      alert("Updated successfully!");
-    } catch (err) {
-      console.log(err);
-      alert("Update failed");
-    }
-  };
+  const hasActiveFilters =
+    searchTerm || selectedCategory !== "all" || filterVeg !== null;
 
-  if (loading) {
+  if (loading && ingredients.length === 0) {
     return (
       <div className="p-6 sm:p-10 text-center font-bold">
         Loading Inventory...
@@ -65,423 +119,265 @@ const ViewIngredients = () => {
   }
 
   return (
-    <PageContainer maxWidth="6xl" gradient="slate">
-      <div className="p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-black text-slate-800">
-            Inventory Management
-          </h1>
-          <Badge variant="info" size="lg">
-            {ingredients.length} Items
-          </Badge>
+    <PageContainer maxWidth="7xl" gradient="slate">
+      <div className="p-0 sm:p-6 lg:p-8">
+        {/* Header */}
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-800 mb-6">
+          Inventory Management ({displayedIngredients.length})
+        </h1>
+
+        {/* Search and Filters */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={20}
+                />
+                <input
+                  type="text"
+                  placeholder="Search by name, category, or keywords..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex-shrink-0 lg:w-48">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === "all"
+                      ? "All Categories"
+                      : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Veg/Non-Veg Filter */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilterVeg(null)}
+                className={`px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
+                  filterVeg === null
+                    ? "bg-indigo-600 text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilterVeg(true)}
+                className={`px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
+                  filterVeg === true
+                    ? "bg-green-600 text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                🌱 Veg
+              </button>
+              <button
+                onClick={() => setFilterVeg(false)}
+                className={`px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
+                  filterVeg === false
+                    ? "bg-red-600 text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                🍖 Non-Veg
+              </button>
+            </div>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-sm transition-colors flex items-center gap-2"
+              >
+                <X size={16} />
+                Clear
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Mobile Card View */}
-        <div className="block lg:hidden space-y-4">
-          {ingredients.map((item) => (
+        {/* No Results */}
+        {displayedIngredients.length === 0 && (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-4">
+              <Search size={32} className="text-slate-400" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-700 mb-2">
+              No ingredients found
+            </h3>
+            <p className="text-slate-500 mb-4">
+              Try adjusting your search or filters
+            </p>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors"
+              >
+                Clear All Filters
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Cards Grid - Mobile & Desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {displayedIngredients.map((item) => (
             <div
               key={item._id}
-              className="bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+              className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-all duration-300 group"
             >
-              {/* Header with Image and Name */}
-              <div className="flex items-start gap-3 mb-4">
+              {/* Image */}
+              <div
+                className="relative h-48 bg-linear-to-br from-slate-100 to-slate-200 cursor-pointer overflow-hidden"
+                onClick={() => setSelectedIngredient(item)}
+              >
                 <img
                   src={item.imageUrl}
                   alt={item.name}
-                  className="w-16 h-16 rounded-lg object-cover bg-slate-100 cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all flex-shrink-0"
-                  onClick={() => setSelectedIngredient(item)}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="flex-1 min-w-0">
-                  {editingId === item._id ? (
-                    <input
-                      className="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 mb-2"
-                      value={editForm.name}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, name: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <p
-                      className="font-bold text-slate-700 cursor-pointer hover:text-indigo-600 transition-colors mb-1"
-                      onClick={() => setSelectedIngredient(item)}
-                    >
-                      {item.name}
-                    </p>
-                  )}
-                  <p className="text-[10px] text-slate-400 uppercase font-mono truncate">
-                    {item._id}
-                  </p>
+                <div className="absolute top-2 right-2">
+                  <Badge variant={item.isVeg ? "success" : "danger"} size="sm">
+                    {item.isVeg ? "🌱" : "🍖"}
+                  </Badge>
                 </div>
+                {!item.available && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                      Unavailable
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                {/* Category */}
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
-                    Category
-                  </p>
+              {/* Content */}
+              <div className="p-4">
+                {/* Name and Category */}
+                <div className="mb-3">
+                  <h3
+                    className="font-bold text-slate-800 text-lg mb-1 cursor-pointer hover:text-indigo-600 transition-colors line-clamp-1"
+                    onClick={() => setSelectedIngredient(item)}
+                  >
+                    {item.name}
+                  </h3>
                   <Badge variant="secondary" size="sm">
                     {item.category}
                   </Badge>
                 </div>
 
-                {/* Price */}
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
-                    Price / Unit
+                {/* Price Configurations */}
+                <div className="mb-4">
+                  <p className="text-xs uppercase font-bold text-slate-400 mb-2">
+                    Pricing ({item.priceConfigs?.length || 0})
                   </p>
-                  <div className="flex items-center gap-1 text-sm">
-                    <span className="text-slate-400 font-medium">₹</span>
-                    {editingId === item._id ? (
-                      <input
-                        type="number"
-                        className="w-16 border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-indigo-500"
-                        value={editForm.pricePerUnit}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            pricePerUnit: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      <span className="font-bold text-slate-700">
-                        {item.pricePerUnit}
-                      </span>
+                  <div className="space-y-1.5 flex-wrap">
+                    {item.priceConfigs?.slice(0, 2).map((config, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between  text-xs bg-green-50 px-2 py-1.5 rounded border border-green-100"
+                      >
+                        <span className="font-semibold text-green-700">
+                          {config.value} {config.unit}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-green-900">
+                            ₹{config.price}
+                          </span>
+                          {config.mrp > config.price && (
+                            <span className="text-[10px] text-slate-500 line-through">
+                              ₹{config.mrp}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {item.priceConfigs?.length > 2 && (
+                      <p className="text-xs text-slate-500 text-center">
+                        +{item.priceConfigs.length - 2} more
+                      </p>
                     )}
-                    <span className="text-slate-400 text-xs">
-                      / {item.unit}
-                    </span>
                   </div>
                 </div>
-              </div>
 
-              {/* Status */}
-              <div className="mb-4">
-                <button
-                  className={`flex items-center gap-1 text-[10px] font-black uppercase px-3 py-1.5 rounded-lg ${
-                    item.isHidden
-                      ? "bg-amber-50 text-amber-600"
-                      : "bg-emerald-50 text-emerald-600"
-                  }`}
-                >
-                  {item.isHidden ? <EyeOff size={12} /> : <Eye size={12} />}
-                  {item.isHidden ? "Hidden" : "Active"}
-                </button>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedIngredient(item)}
-                  className="flex-1 p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  <Info size={16} />
-                  <span className="text-sm font-semibold">Details</span>
-                </button>
-                {editingId === item._id ? (
-                  <>
-                    <button
-                      onClick={handleUpdate}
-                      className="flex-1 p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-sm font-semibold"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={cancelEdit}
-                      className="flex-1 p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-sm font-semibold"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => startEdit(item)}
-                      className="flex-1 p-2 text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors text-sm font-semibold"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="flex-1 p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-semibold"
-                    >
-                      Delete
-                    </button>
-                  </>
+                {/* Keywords */}
+                {item.keywords?.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-1">
+                      {item.keywords.slice(0, 3).map((keyword, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 bg-indigo-50 border border-indigo-200 rounded text-[10px] font-medium text-indigo-700"
+                        >
+                          {keyword}
+                        </span>
+                      ))}
+                      {item.keywords.length > 3 && (
+                        <span className="px-2 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-medium text-slate-500">
+                          +{item.keywords.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 )}
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSelectedIngredient(item)}
+                    className="flex-1 p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    title="View Details"
+                  >
+                    <Info size={16} />
+                    <span className="text-sm font-semibold">Details</span>
+                  </button>
+                  <button
+                    onClick={() => handleEdit(item._id)}
+                    className="flex-1 p-2 text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors text-sm font-semibold"
+                    title="Edit Ingredient"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item._id)}
+                    className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                    title="Delete Ingredient"
+                  >
+                    <Trash size={16} />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Desktop Table View */}
-        <div className="hidden lg:block">
-          <Table>
-            <TableHeader>
-              <TableHeaderCell>Ingredient</TableHeaderCell>
-              <TableHeaderCell>Category</TableHeaderCell>
-              <TableHeaderCell>Price / Unit</TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
-              <TableHeaderCell align="right">Actions</TableHeaderCell>
-            </TableHeader>
-
-            <TableBody>
-              {ingredients.map((item) => (
-                <TableRow key={item._id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={item.imageUrl}
-                        alt=""
-                        className="w-10 h-10 rounded-lg object-cover bg-slate-100 cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all"
-                        onClick={() => setSelectedIngredient(item)}
-                      />
-                      <div>
-                        {editingId === item._id ? (
-                          <input
-                            className="border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-indigo-500"
-                            value={editForm.name}
-                            onChange={(e) =>
-                              setEditForm({ ...editForm, name: e.target.value })
-                            }
-                          />
-                        ) : (
-                          <p
-                            className="font-bold text-slate-700 cursor-pointer hover:text-indigo-600 transition-colors"
-                            onClick={() => setSelectedIngredient(item)}
-                          >
-                            {item.name}
-                          </p>
-                        )}
-                        <p className="text-[10px] text-slate-400 uppercase font-mono">
-                          {item._id}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <Badge variant="secondary" size="sm">
-                      {item.category}
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="flex items-center gap-1 text-sm">
-                      <span className="text-slate-400 font-medium">₹</span>
-                      {editingId === item._id ? (
-                        <input
-                          type="number"
-                          className="w-20 border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-indigo-500"
-                          value={editForm.pricePerUnit}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              pricePerUnit: e.target.value,
-                            })
-                          }
-                        />
-                      ) : (
-                        <span className="font-bold text-slate-700">
-                          {item.pricePerUnit}
-                        </span>
-                      )}
-                      <span className="text-slate-400">/ {item.unit}</span>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <button
-                      className={`flex items-center gap-1 text-[10px] font-black uppercase px-2 py-1 rounded ${
-                        item.isHidden
-                          ? "bg-amber-50 text-amber-600"
-                          : "bg-emerald-50 text-emerald-600"
-                      }`}
-                    >
-                      {item.isHidden ? <EyeOff size={12} /> : <Eye size={12} />}
-                      {item.isHidden ? "Hidden" : "Active"}
-                    </button>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="flex items-center gap-2 justify-end">
-                      <button
-                        onClick={() => setSelectedIngredient(item)}
-                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                        title="View Details"
-                      >
-                        <Info size={18} />
-                      </button>
-                      <ActionButtons
-                        isEditing={editingId === item._id}
-                        onEdit={() => startEdit(item)}
-                        onDelete={() => handleDelete(item._id)}
-                        onSave={handleUpdate}
-                        onCancel={cancelEdit}
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
       </div>
 
-      {/* Ingredient Details Modal - Responsive */}
       {selectedIngredient && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
-            {/* Header with Image */}
-            <div className="relative h-48 sm:h-56 bg-gradient-to-br from-indigo-500 to-purple-600">
-              {selectedIngredient.imageUrl ? (
-                <img
-                  src={selectedIngredient.imageUrl}
-                  alt={selectedIngredient.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Package size={60} className="text-white/50" />
-                </div>
-              )}
-              <button
-                onClick={() => setSelectedIngredient(null)}
-                className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full transition-colors shadow-lg"
-              >
-                <X size={20} className="text-gray-700" />
-              </button>
-
-              {/* Status Badge */}
-              <div className="absolute bottom-3 left-3">
-                <span
-                  className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold text-xs sm:text-sm shadow-lg ${
-                    selectedIngredient.isHidden
-                      ? "bg-amber-500 text-white"
-                      : "bg-emerald-500 text-white"
-                  }`}
-                >
-                  {selectedIngredient.isHidden ? (
-                    <EyeOff size={14} />
-                  ) : (
-                    <Eye size={14} />
-                  )}
-                  {selectedIngredient.isHidden ? "Hidden" : "Active"}
-                </span>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-12rem)] sm:max-h-[calc(90vh-14rem)]">
-              {/* Title */}
-              <div className="mb-4 sm:mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                  {selectedIngredient.name}
-                </h2>
-                <p className="text-xs sm:text-sm text-gray-500 font-mono break-all">
-                  ID: {selectedIngredient._id}
-                </p>
-              </div>
-
-              {/* Details Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                {/* Category */}
-                <div className="p-3 sm:p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Tag className="text-indigo-600" size={18} />
-                    <span className="text-xs font-bold text-indigo-900 uppercase">
-                      Category
-                    </span>
-                  </div>
-                  <p className="text-base sm:text-lg font-bold text-indigo-700">
-                    {selectedIngredient.category}
-                  </p>
-                </div>
-
-                {/* Price */}
-                <div className="p-3 sm:p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="text-green-600" size={18} />
-                    <span className="text-xs font-bold text-green-900 uppercase">
-                      Price
-                    </span>
-                  </div>
-                  <p className="text-base sm:text-lg font-bold text-green-700">
-                    ₹{selectedIngredient.pricePerUnit}
-                    <span className="text-sm font-normal text-green-600">
-                      {" "}
-                      / {selectedIngredient.unit}
-                    </span>
-                  </p>
-                </div>
-
-                {/* Unit */}
-                <div className="p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Package className="text-orange-600" size={18} />
-                    <span className="text-xs font-bold text-orange-900 uppercase">
-                      Unit of Measure
-                    </span>
-                  </div>
-                  <p className="text-base sm:text-lg font-bold text-orange-700">
-                    {selectedIngredient.unit}
-                  </p>
-                </div>
-
-                {/* Visibility */}
-                <div
-                  className={`p-3 sm:p-4 rounded-xl border ${
-                    selectedIngredient.isHidden
-                      ? "bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100"
-                      : "bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-100"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    {selectedIngredient.isHidden ? (
-                      <EyeOff className="text-amber-600" size={18} />
-                    ) : (
-                      <Eye className="text-emerald-600" size={18} />
-                    )}
-                    <span
-                      className={`text-xs font-bold uppercase ${
-                        selectedIngredient.isHidden
-                          ? "text-amber-900"
-                          : "text-emerald-900"
-                      }`}
-                    >
-                      Visibility
-                    </span>
-                  </div>
-                  <p
-                    className={`text-base sm:text-lg font-bold ${
-                      selectedIngredient.isHidden
-                        ? "text-amber-700"
-                        : "text-emerald-700"
-                    }`}
-                  >
-                    {selectedIngredient.isHidden
-                      ? "Hidden from Users"
-                      : "Visible to Users"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Additional Info */}
-              {selectedIngredient.description && (
-                <div className="p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <h3 className="text-xs sm:text-sm font-bold text-gray-700 mb-2 uppercase">
-                    Description
-                  </h3>
-                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                    {selectedIngredient.description}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <IngredientDetailsModal
+          selectedIngredient={selectedIngredient}
+          setSelectedIngredient={setSelectedIngredient}
+        />
       )}
     </PageContainer>
   );

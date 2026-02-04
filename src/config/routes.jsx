@@ -9,32 +9,32 @@ import {
 
 export const adminRoutes = [
   {
-    path: "/admin/dashboard",
+    path: "dashboard",
     label: "Dashboard",
     icon: <LayoutDashboard size={20} />,
   },
   {
-    path: "/admin/ingredients",
+    path: "ingredients",
     label: "View Inventory",
     icon: <Carrot size={20} />,
   },
   {
-    path: "/admin/ingredients/add",
+    path: "ingredients/add",
     label: "Add Ingredient",
     icon: <PlusCircle size={20} />,
   },
   {
-    path: "/admin/dishes",
+    path: "dishes",
     label: "Manage Dishes",
     icon: <Salad size={20} />,
   },
   {
-    path: "/admin/dishes/add",
+    path: "dishes/add",
     label: "Add Dish",
     icon: <CookingPot size={20} />,
   },
   {
-    path: "/admin/users",
+    path: "users",
     label: "Manage Users",
     icon: <Users size={20} />,
   },

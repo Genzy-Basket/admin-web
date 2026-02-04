@@ -85,7 +85,7 @@ const AdminLayout = () => {
       {/* Content Area */}
       <main className="flex-1 overflow-y-auto w-full lg:w-auto">
         {/* Header */}
-        <header className="h-14 sm:h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
+        <header className="h-14 sm:h-16 bg-white border-b border-slate-200 flex items-center justify-between px-2 sm:px-8 sticky top-0 z-10">
           {/* Mobile Menu Button */}
           <button
             onClick={() => setSidebarOpen(true)}

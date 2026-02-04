@@ -30,7 +30,7 @@ const PageContainer = ({
 
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br ${gradientClasses[gradient]} p-6 ${className}`}
+      className={`min-h-screen bg-linear-to-br ${gradientClasses[gradient]} p-3 sm:p-6 lg:p-8${className}`}
     >
       <div className={`${maxWidthClasses[maxWidth]} mx-auto`}>
         {title && (

@@ -8,6 +8,7 @@ const FormSelect = ({
   icon: Icon,
   className = "",
   capitalize = true,
+  vPadding = "py-2",
 }) => {
   return (
     <div className={className}>
@@ -23,7 +24,7 @@ const FormSelect = ({
         value={value}
         onChange={onChange}
         required={required}
-        className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white ${
+        className={`w-full px-4 ${vPadding} border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white ${
           capitalize ? "capitalize" : ""
         }`}
       >

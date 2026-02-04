@@ -300,7 +300,7 @@ function ManageDish() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
             {/* Header with Image */}
-            <div className="relative h-64 bg-gradient-to-br from-orange-400 to-orange-600">
+            <div className="relative h-64 bg-linear-to-br from-orange-400 to-orange-600">
               {selectedDish.imageUrl ? (
                 <img
                   src={selectedDish.imageUrl}
@@ -409,7 +409,7 @@ function ManageDish() {
                     <div className="space-y-3">
                       {selectedDish.instructions.map((instruction, idx) => (
                         <div key={idx} className="flex gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-orange-500 text-white font-bold rounded-lg shadow-sm">
+                          <div className="shrink-0 w-8 h-8 flex items-center justify-center bg-orange-500 text-white font-bold rounded-lg shadow-sm">
                             {idx + 1}
                           </div>
                           <p className="flex-1 text-gray-700 leading-relaxed pt-1">

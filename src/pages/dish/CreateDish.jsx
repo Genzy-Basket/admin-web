@@ -396,7 +396,7 @@ function CreateDishForm() {
                               <GripVertical size={20} />
                             </div>
 
-                            <div className="flex-shrink-0 w-8 h-10 flex items-center justify-center bg-orange-100 text-orange-700 font-bold rounded-lg shadow-sm">
+                            <div className="shrink-0 w-8 h-10 flex items-center justify-center bg-orange-100 text-orange-700 font-bold rounded-lg shadow-sm">
                               {index + 1}
                             </div>
 

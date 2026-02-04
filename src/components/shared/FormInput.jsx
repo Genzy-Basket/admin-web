@@ -11,6 +11,7 @@ const FormInput = ({
   step,
   icon: Icon,
   className = "",
+  vPadding = "py-3",
 }) => {
   return (
     <div className={className}>
@@ -31,7 +32,7 @@ const FormInput = ({
         min={min}
         max={max}
         step={step}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+        className={`w-full px-4 ${vPadding} border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none`}
       />
     </div>
   );
