@@ -1,11 +1,10 @@
 import {
   LayoutDashboard,
   Carrot,
-  ShoppingCart,
   PlusCircle,
-  User,
-  CookingPot,
   Salad,
+  CookingPot,
+  Users,
 } from "lucide-react";
 
 export const adminRoutes = [
@@ -26,22 +25,17 @@ export const adminRoutes = [
   },
   {
     path: "/admin/dishes",
-    label: "Manage Dish",
+    label: "Manage Dishes",
     icon: <Salad size={20} />,
   },
   {
     path: "/admin/dishes/add",
-    label: "Add Dishes",
+    label: "Add Dish",
     icon: <CookingPot size={20} />,
   },
   {
-    path: "/admin/manage-users/",
+    path: "/admin/users",
     label: "Manage Users",
-    icon: <User size={20} />,
-  },
-  {
-    path: "/admin/orders",
-    label: "Orders",
-    icon: <ShoppingCart size={20} />,
+    icon: <Users size={20} />,
   },
 ];

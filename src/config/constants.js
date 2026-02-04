@@ -74,3 +74,5 @@ export const dietaryTags = [
   "comfort-food",
   "street-food",
 ].sort();
+
+export const ingredientStatuses = ["essential", "optional", "seasonal"];

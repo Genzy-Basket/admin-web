@@ -12,7 +12,7 @@ export const ingredientApi = {
   },
 
   update: async (id, data) => {
-    const response = await axiosClient.patch(`/ingredient/${id}`, data);
+    const response = await axiosClient.put(`/ingredient/${id}`, data);
     return response.data;
   },
 
@@ -20,19 +20,4 @@ export const ingredientApi = {
     const response = await axiosClient.delete(`/ingredient/${id}`);
     return response.data;
   },
-
-  toggleVisibility: async (id, isHidden) => {
-    const response = await axiosClient.patch(`/ingredient/${id}`, {
-      isHidden,
-    });
-    return response.data;
-  },
-};
-
-/**
- * Media Related API (Cloudinary Signature)
- */
-export const getCloudinarySignature = async (folder) => {
-  const response = await axiosClient.get(`/media-upload-signature/${folder}`);
-  return response.data;
 };

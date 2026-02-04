@@ -1,48 +1,49 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import AdminLayout from "./pages/adminLayout";
-import ManageUsers from "./pages/manage_users";
-import CreateDishForm from "./pages/CreateDish";
-import ManageDish from "./pages/ManageDish";
+import { AuthProvider } from "./context/AuthContext";
 import { IngredientsProvider } from "./context/IngredientsContext";
-import ViewIngredients from "./pages/Ingrents/view_ingredients";
-import IngredientForm from "./pages/Ingrents/Ingredient_upload_form";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoginPage from "./pages/LoginPage";
+import AdminLayout from "./pages/AdminLayout";
+import Dashboard from "./pages/Dashboard";
+import ViewIngredients from "./pages/ingredients/ViewIngredients";
+import IngredientForm from "./pages/ingredients/IngredientUploadForm";
+import ManageDish from "./pages/dish/ManageDish";
+import CreateDishForm from "./pages/dish/CreateDish";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Redirect root to dashboard */}
-        <Route path="/" element={<Navigate to="/admin/dashboard" />} />
+    <AuthProvider>
+      <BrowserRouter basename="/admin">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<LoginPage />} />
 
-        {/* Admin Protected Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<div>Dashboard Stats Page</div>} />
+          {/* Protected Admin Routes - Wrap with IngredientsProvider */}
           <Route
-            path="ingredients"
+            path="/"
             element={
-              <IngredientsProvider>
-                <ViewIngredients />
-              </IngredientsProvider>
+              <ProtectedRoute>
+                <IngredientsProvider>
+                  <AdminLayout />
+                </IngredientsProvider>
+              </ProtectedRoute>
             }
-          />
-          <Route path="ingredients/add" element={<IngredientForm />} />
-          <Route path="dishes" element={<ManageDish />} />
-          <Route
-            path="dishes/add"
-            element={
-              <IngredientsProvider>
-                <CreateDishForm />
-              </IngredientsProvider>
-            }
-          />
-          <Route path="manage-users" element={<ManageUsers />} />
-          {/* Add more feature routes here */}
-        </Route>
+          >
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="ingredients" element={<ViewIngredients />} />
+            <Route path="ingredients/add" element={<IngredientForm />} />
+            <Route path="dishes" element={<ManageDish />} />
+            <Route path="dishes/add" element={<CreateDishForm />} />
+            {/* <Route path="users" element={<ManageUsers />} /> */}
+          </Route>
 
-        {/* 404 Page */}
-        <Route path="*" element={<div>404 - Not Found</div>} />
-      </Routes>
-    </BrowserRouter>
+          {/* Redirects */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

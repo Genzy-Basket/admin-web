@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { IngredientModal } from "./Ingrents/ingredientsModal";
+import { IngredientModal } from "../ingredients/IngredientsModal";
 import {
   Plus,
   GripVertical,
@@ -18,9 +18,9 @@ import {
   Button,
   SectionHeader,
   ListItem,
-} from "./components/shared";
-import { dishApi } from "../api/dishApi";
-import { uploadToCloudinary } from "../api/axiosClient";
+} from "../../components/shared";
+import { dishApi } from "../../api/dishApi";
+import { mediaApi } from "../../api/mediaApi";
 
 function CreateDishForm() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -165,7 +165,7 @@ function CreateDishForm() {
       // Upload image to Cloudinary if present
       let imageUrl = dish.imageUrl;
       if (imageFile) {
-        imageUrl = await uploadToCloudinary(imageFile);
+        imageUrl = await mediaApi.uploadToCloudinary(imageFile);
       }
 
       // Prepare dish data
