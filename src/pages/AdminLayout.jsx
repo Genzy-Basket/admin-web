@@ -1,117 +1,92 @@
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { LogOut, Menu, X } from "lucide-react";
-import { adminRoutes } from "../config/routes";
-import { useState } from "react";
+import React, { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../modules/auth/context/AuthContext";
+import { useProduct } from "../modules/product/context/ProductContext";
+import { useUsers } from "../modules/user/context/UserContext";
+import { Users, Package, FilePlus } from "lucide-react";
+import { Header } from "../components/shared/Header";
+import { Sidebar } from "../components/shared/Sidebar";
 
 const AdminLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const { logout, user } = useAuth();
+  const { fetchProducts } = useProduct();
+  const { fetchUsers } = useUsers();
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const navigation = [
+    { name: "Users", href: "/users", icon: Users, end: true },
+    { name: "Inventory", href: "/products", icon: Package, end: true },
+    { name: "Add Product", href: "/products/add", icon: FilePlus, end: true },
+  ];
 
-  const closeSidebar = () => {
-    setSidebarOpen(false);
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      if (location.pathname.includes("/products"))
+        await fetchProducts({}, true);
+      else if (location.pathname.includes("/users")) await fetchUsers({}, true);
+    } catch (err) {
+      console.error("Refresh failed", err);
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 600);
+    }
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="h-screen bg-[#F8FAFC] flex overflow-hidden font-sans text-slate-900">
       {/* Mobile Overlay */}
-      {sidebarOpen && (
+      {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-          onClick={closeSidebar}
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar Section */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 w-64 bg-white border-r border-slate-200 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 h-full shrink-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* Sidebar Header */}
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-          <h1 className="text-xl font-black text-indigo-600 tracking-tight">
-            Veggi-Cart Admin
-          </h1>
-          <button
-            onClick={closeSidebar}
-            className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {adminRoutes.map((route) => {
-            const isActive = location.pathname === route.path;
-            return (
-              <Link
-                key={route.path}
-                to={route.path}
-                onClick={closeSidebar}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100"
-                    : "text-slate-500 hover:bg-slate-50"
-                }`}
-              >
-                {route.icon}
-                {route.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Logout Button */}
-        <div className="p-4 border-t border-slate-100">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 w-full transition-all"
-          >
-            <LogOut size={20} />
-            Logout
-          </button>
-        </div>
+        <Sidebar
+          navigation={navigation}
+          user={user}
+          logout={logout}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
       </aside>
 
-      {/* Content Area */}
-      <main className="flex-1 overflow-y-auto w-full lg:w-auto">
-        {/* Header */}
-        <header className="h-14 sm:h-16 bg-white border-b border-slate-200 flex items-center justify-between px-2 sm:px-8 sticky top-0 z-10">
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <Menu size={24} />
-          </button>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <Header
+          setIsSidebarOpen={setIsSidebarOpen}
+          handleRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+          user={user}
+        />
 
-          {/* Welcome Text */}
-          <p className="text-xs sm:text-sm font-medium text-slate-400 truncate">
-            Welcome back, {user?.fullName || "Admin"}
-          </p>
-
-          {/* User Email */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500 hidden sm:block">
-              {user?.email}
-            </span>
+        <main className="flex-1 overflow-y-auto bg-[#F8FAFC] custom-scrollbar">
+          <div className="p-6 lg:p-10">
+            <div className="max-w-7xl mx-auto animate-in">
+              <Outlet />
+            </div>
           </div>
-        </header>
+        </main>
+      </div>
 
-        {/* Page Content */}
-        <div className="p-0">
-          <Outlet />
-        </div>
-      </main>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 20px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: slideIn 0.4s ease-out forwards; }
+      `,
+        }}
+      />
     </div>
   );
 };

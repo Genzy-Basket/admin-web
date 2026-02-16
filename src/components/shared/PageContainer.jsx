@@ -2,7 +2,7 @@ const PageContainer = ({
   children,
   title,
   icon: Icon,
-  maxWidth = "3xl",
+  maxWidth = "7xl",
   gradient = "orange",
   className = "",
 }) => {
@@ -30,7 +30,7 @@ const PageContainer = ({
 
   return (
     <div
-      className={`min-h-screen bg-linear-to-br ${gradientClasses[gradient]} p-3 sm:p-6 lg:p-8${className}`}
+      className={`min-h-screen  ${gradientClasses[gradient]} p-3 sm:p-6 lg:p-8${className}`}
     >
       <div className={`${maxWidthClasses[maxWidth]} mx-auto`}>
         {title && (

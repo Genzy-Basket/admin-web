@@ -29,14 +29,14 @@ const ListItem = ({
       `}
     >
       {/* Left Slot */}
-      {leftSlot && <div className="flex-shrink-0">{leftSlot}</div>}
+      {leftSlot && <div className="shrink-0">{leftSlot}</div>}
 
       {/* Image */}
       {image && (
         <img
           src={image}
           alt=""
-          className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+          className="w-10 h-10 rounded-lg object-cover shrink-0"
         />
       )}
 
@@ -51,14 +51,14 @@ const ListItem = ({
       </div>
 
       {/* Right Slot */}
-      {rightSlot && <div className="flex-shrink-0">{rightSlot}</div>}
+      {rightSlot && <div className="shrink-0">{rightSlot}</div>}
 
       {/* Remove Button */}
       {onRemove && (
         <button
           type="button"
           onClick={onRemove}
-          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"
         >
           <X size={18} />
         </button>

@@ -1,20 +1,15 @@
+// src/components/ProtectedRoute.jsx
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../modules/auth/context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="text-lg font-semibold text-slate-600 animate-pulse">
-          Loading...
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading Auth...</div>;
 
-  if (!user) {
+  if (!isAuthenticated) {
+    // Note: We use /login here, but because of basename="/admin",
+    // it will actually point to /admin/login
     return <Navigate to="/login" replace />;
   }
 

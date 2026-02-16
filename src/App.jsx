@@ -1,51 +1,45 @@
+// src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { IngredientsProvider } from "./context/IngredientsContext";
+import { AuthProvider } from "./modules/auth/context/AuthContext";
+import { UserProvider } from "./modules/user/context/UserContext";
+import { ProductProvider } from "./modules/product/context/ProductContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LoginPage from "./pages/LoginPage";
 import AdminLayout from "./pages/AdminLayout";
-import Dashboard from "./pages/Dashboard";
-import ViewIngredients from "./pages/ingredients/ViewIngredients";
-import IngredientForm from "./pages/ingredients/IngredientUploadForm";
-import ManageDish from "./pages/dish/ManageDish";
-import CreateDishForm from "./pages/dish/CreateDish";
-import UpdateIngredient from "./pages/ingredients/UpdateIngredientPage";
+import LoginPage from "./modules/auth/pages/LoginPage";
+import UsersPage from "./modules/user/pages/UsersPage";
+import ProductsPage from "./modules/product/pages/ProductsPage";
+import NewProductPage from "./modules/product/pages/NewProductPage";
+import EditProductPage from "./modules/product/pages/EditProductPage";
 
 function App() {
   return (
     <AuthProvider>
-      {/* 1. Basename is great, but ensure your redirects use relative paths if needed */}
       <BrowserRouter basename="/admin">
         <Routes>
-          {/* Public Routes */}
-          <Route path="login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected Admin Routes */}
           <Route
-            path="/"
             element={
               <ProtectedRoute>
-                <IngredientsProvider>
-                  <AdminLayout />
-                </IngredientsProvider>
+                <UserProvider>
+                  <ProductProvider>
+                    <AdminLayout />
+                  </ProductProvider>
+                </UserProvider>
               </ProtectedRoute>
             }
           >
-            {/* 2. Use 'index' for the default view without a heavy redirect if possible, 
-               or ensure the path is absolute within the router context */}
-            <Route index element={<Dashboard />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="ingredients" element={<ViewIngredients />} />
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/add" element={<NewProductPage />} />
             <Route
-              path="/ingredients/update/:id"
-              element={<UpdateIngredient />}
+              path="/products/edit/:productId"
+              element={<EditProductPage />}
             />
-            <Route path="ingredients/add" element={<IngredientForm />} />
-            <Route path="dishes" element={<ManageDish />} />
-            <Route path="dishes/add" element={<CreateDishForm />} />
+
+            <Route path="/" element={<Navigate to="/users" replace />} />
           </Route>
 
-          {/* 3. Global Catch-all: Only one redirect at the bottom */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useIngredients } from "../context/IngredientsContext";
-import { dishApi } from "../api/dishApi";
-import { userApi } from "../api/userApi";
+
 import { LayoutDashboard, Carrot, UtensilsCrossed, Users } from "lucide-react";
 
 const Dashboard = () => {

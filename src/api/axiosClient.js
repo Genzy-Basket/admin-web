@@ -7,12 +7,8 @@ const axiosClient = axios.create({
   },
 });
 
-// Request interceptor to add auth token
 axiosClient.interceptors.request.use(
   (config) => {
-    console.log("Request URL:", config.url);
-
-    // Skip adding token for public authentication endpoints
     const publicEndpoints = [
       "/auth/admin/login",
       "/auth/register",
@@ -22,12 +18,8 @@ axiosClient.interceptors.request.use(
       (endpoint) => config.url === endpoint || config.url?.endsWith(endpoint),
     );
 
-    console.log("Is public endpoint:", isPublicEndpoint);
-
     if (!isPublicEndpoint) {
-      // Try to get admin token first (for admin operations)
       const adminToken = localStorage.getItem("adminToken");
-      // Then try regular user token
       const userToken = localStorage.getItem("token");
 
       // Use admin token if available, otherwise use user token
@@ -35,12 +27,10 @@ axiosClient.interceptors.request.use(
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log("Token added to request:", adminToken ? "admin" : "user");
       } else {
-        console.log("No token found");
+        alert("No token found");
       }
     } else {
-      console.log("Skipping token for public endpoint");
     }
 
     return config;
