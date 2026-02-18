@@ -8,6 +8,7 @@ import DeleteConfirmModal from "../../../components/shared/DeleteConfirmationMod
 import toast from "react-hot-toast";
 
 const ProductCard = memo(({ product, onView }) => {
+  const navigate = useNavigate();
   const { deleteProduct } = useProduct();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 

@@ -1,5 +1,10 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  HashRouter as BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "./modules/auth/context/AuthContext";
 import { UserProvider } from "./modules/user/context/UserContext";
 import { ProductProvider } from "./modules/product/context/ProductContext";
@@ -14,10 +19,9 @@ import EditProductPage from "./modules/product/pages/EditProductPage";
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter basename="/admin">
+      <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-
           <Route
             element={
               <ProtectedRoute>
@@ -39,7 +43,6 @@ function App() {
 
             <Route path="/" element={<Navigate to="/users" replace />} />
           </Route>
-
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
