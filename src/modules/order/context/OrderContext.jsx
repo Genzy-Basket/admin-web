@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { orderApi } from "../../../api/endpoints/order.api";
+import { errorBus } from "../../../api/errorBus";
 
 const OrderContext = createContext();
 
@@ -20,21 +21,22 @@ export const OrderProvider = ({ children }) => {
       setOrders(res.orders || []);
       setPagination(res.pagination || null);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch orders");
+      const message = err.message || "Failed to fetch orders";
+      setError(message);
+      errorBus.emit(message, "error");
     } finally {
       setLoading(false);
     }
   }, [orders.length]);
 
-  const fetchStats = useCallback(async (force = false) => {
-    if (!force && stats !== null) return;
+  const fetchStats = useCallback(async (params = {}) => {
     try {
-      const res = await orderApi.getStats();
+      const res = await orderApi.getStats(params);
       setStats(res.data);
     } catch (err) {
-      console.error("Failed to fetch order stats", err);
+      errorBus.emit(err.message || "Failed to fetch order stats", "error");
     }
-  }, [stats]);
+  }, []);
 
   const fetchOrder = useCallback(async (orderId) => {
     setLoading(true);
@@ -44,7 +46,9 @@ export const OrderProvider = ({ children }) => {
       setCurrentOrder(res.data);
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.message || "Order not found");
+      const message = err.message || "Order not found";
+      setError(message);
+      errorBus.emit(message, "error");
       return null;
     } finally {
       setLoading(false);
@@ -60,12 +64,12 @@ export const OrderProvider = ({ children }) => {
           prev.map((o) => (o.orderId === orderId ? updated : o)),
         );
         if (currentOrder?.orderId === orderId) setCurrentOrder(updated);
+        errorBus.emit("Order status updated", "success");
         return { success: true, data: updated };
       } catch (err) {
-        return {
-          success: false,
-          message: err.response?.data?.message || "Failed to update status",
-        };
+        const message = err.message || "Failed to update status";
+        errorBus.emit(message, "error");
+        return { success: false, message };
       }
     },
     [currentOrder],
@@ -80,12 +84,12 @@ export const OrderProvider = ({ children }) => {
           prev.map((o) => (o.orderId === orderId ? updated : o)),
         );
         if (currentOrder?.orderId === orderId) setCurrentOrder(updated);
+        errorBus.emit("Order cancelled", "success");
         return { success: true, data: updated };
       } catch (err) {
-        return {
-          success: false,
-          message: err.response?.data?.message || "Failed to cancel order",
-        };
+        const message = err.message || "Failed to cancel order";
+        errorBus.emit(message, "error");
+        return { success: false, message };
       }
     },
     [currentOrder],
@@ -94,14 +98,13 @@ export const OrderProvider = ({ children }) => {
   const bulkOutForDelivery = useCallback(async () => {
     try {
       const res = await orderApi.bulkOutForDelivery();
-      // Refresh the list so the UI reflects updated statuses
       await fetchOrders({}, true);
+      errorBus.emit(res.message || "Bulk update successful", "success");
       return { success: true, modifiedCount: res.modifiedCount, message: res.message };
     } catch (err) {
-      return {
-        success: false,
-        message: err.response?.data?.message || "Bulk update failed",
-      };
+      const message = err.message || "Bulk update failed";
+      errorBus.emit(message, "error");
+      return { success: false, message };
     }
   }, [fetchOrders]);
 

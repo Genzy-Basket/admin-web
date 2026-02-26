@@ -2,8 +2,8 @@ import axiosClient from "../axiosClient";
 
 export const orderApi = {
   /** Dashboard stats — byStatus counts, today's revenue, all-time revenue */
-  getStats: async () => {
-    const res = await axiosClient.get("/admin/orders/stats");
+  getStats: async (params = {}) => {
+    const res = await axiosClient.get("/admin/orders/stats", { params });
     return res.data; // { success, data: { byStatus, today, allTime } }
   },
 
