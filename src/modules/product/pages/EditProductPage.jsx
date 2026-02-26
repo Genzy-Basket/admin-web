@@ -19,7 +19,7 @@ import {
   FormSelect,
 } from "../../../components/shared";
 import { PRODUCT_CATEGORIES, PRODUCT_UNITS } from "../../../config/constants";
-
+import { usePageMeta } from "../../../context/PageHeaderContext";
 import KeywordManager from "../components/KeywordManager";
 import PriceConfigForm from "../components/PriceConfigForm";
 import ImageUploadSection from "../../../components/ImageUploadSection";
@@ -35,6 +35,9 @@ const EditProductPage = () => {
   const [formData, setFormData] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+
+  // No refresh button on the Edit Product page
+  usePageMeta({ title: "Edit Product" });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -81,7 +84,7 @@ const EditProductPage = () => {
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
           <ArrowLeft size={18} /> Back
         </Button>
-        <div className="text-right">
+        <div className="text-right hidden sm:block">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">
             Edit Product
           </h1>
@@ -94,7 +97,6 @@ const EditProductPage = () => {
         className="grid grid-cols-1 lg:grid-cols-12 gap-8"
       >
         <div className="lg:col-span-7 space-y-6">
-          {/* General Information */}
           <Card
             padding="lg"
             className="border-none shadow-sm ring-1 ring-slate-200"
@@ -127,7 +129,6 @@ const EditProductPage = () => {
             </div>
           </Card>
 
-          {/* Pricing Grid - Locked Deletion */}
           <div className="space-y-4">
             <SectionHeader
               icon={Database}
@@ -155,7 +156,7 @@ const EditProductPage = () => {
                   newConfig,
                 ]);
               }}
-              isEditing={true} // This hides the delete buttons
+              isEditing={true}
             />
             <p className="text-xs text-slate-400 italic px-2">
               Note: Existing price configurations cannot be deleted to prevent
@@ -164,7 +165,6 @@ const EditProductPage = () => {
           </div>
         </div>
 
-        {/* Right Sidebar */}
         <div className="lg:col-span-5 space-y-6">
           <ImageUploadSection
             imagePreview={imagePreview}
@@ -176,7 +176,7 @@ const EditProductPage = () => {
             }}
             onRemoveImage={() => {
               setImageFile(null);
-              setImagePreview(formData.imageUrl); // Reset to original if removed
+              setImagePreview(formData.imageUrl);
             }}
             onImageUrlChange={(val) => handleFieldChange("imageUrl", val)}
           />

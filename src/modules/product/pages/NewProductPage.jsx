@@ -13,10 +13,11 @@ import {
   PRODUCT_UNITS,
   INITIAL_FORM_STATE,
 } from "../../../config/constants";
+import { usePageMeta } from "../../../context/PageHeaderContext";
 import KeywordManager from "../components/KeywordManager";
 import ImageUploadSection from "../../../components/ImageUploadSection";
 import QueueDisplay from "../../../components/QueueDisplay";
-import PriceConfigForm from "../components/PriceConfigForm"; // IMPORT THIS
+import PriceConfigForm from "../components/PriceConfigForm";
 import toast from "react-hot-toast";
 
 const NewProductPage = () => {
@@ -24,6 +25,9 @@ const NewProductPage = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const { queue, addToQueue, clearCompleted } = useProductQueue();
+
+  // No refresh button on the Add Product page
+  usePageMeta({ title: "Add Product" });
 
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -65,9 +69,7 @@ const NewProductPage = () => {
     if (!imageFile && !formData.imageUrl) {
       return toast.error("Please provide an image file or URL");
     }
-    // Debug check:
     console.log("Submitting MRP check:", formData.priceConfigs[0].mrp);
-
     addToQueue(formData, imageFile);
     setFormData(INITIAL_FORM_STATE);
     setImageFile(null);
@@ -82,7 +84,7 @@ const NewProductPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto pb-20">
-      <h1 className="text-4xl font-black text-slate-900 mb-8">
+      <h1 className="hidden sm:block text-4xl font-black text-slate-900 mb-8">
         Create Product
       </h1>
 
@@ -167,7 +169,6 @@ const NewProductPage = () => {
             </div>
           </Card>
 
-          {/* THE FIX: Use the Component! */}
           <PriceConfigForm
             configs={formData.priceConfigs}
             onUpdate={updatePriceConfig}

@@ -27,4 +27,9 @@ export const productApi = {
     const response = await axiosClient.delete(`/product/${id}`);
     return response.data;
   },
+
+  bustCache: async () => {
+    const response = await axiosClient.post("/product/cache/bust");
+    return response.data;
+  },
 };

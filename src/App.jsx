@@ -8,6 +8,7 @@ import {
 import { AuthProvider } from "./modules/auth/context/AuthContext";
 import { UserProvider } from "./modules/user/context/UserContext";
 import { ProductProvider } from "./modules/product/context/ProductContext";
+import { OrderProvider } from "./modules/order/context/OrderContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./pages/AdminLayout";
 import LoginPage from "./modules/auth/pages/LoginPage";
@@ -15,6 +16,9 @@ import UsersPage from "./modules/user/pages/UsersPage";
 import ProductsPage from "./modules/product/pages/ProductsPage";
 import NewProductPage from "./modules/product/pages/NewProductPage";
 import EditProductPage from "./modules/product/pages/EditProductPage";
+import OrdersPage from "./modules/order/pages/OrdersPage";
+import OrderDetailPage from "./modules/order/pages/OrderDetailPage";
+import DashboardPage from "./modules/dashboard/pages/DashboardPage";
 
 function App() {
   return (
@@ -27,12 +31,15 @@ function App() {
               <ProtectedRoute>
                 <UserProvider>
                   <ProductProvider>
-                    <AdminLayout />
+                    <OrderProvider>
+                      <AdminLayout />
+                    </OrderProvider>
                   </ProductProvider>
                 </UserProvider>
               </ProtectedRoute>
             }
           >
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/add" element={<NewProductPage />} />
@@ -40,8 +47,10 @@ function App() {
               path="/products/edit/:productId"
               element={<EditProductPage />}
             />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/orders/:orderId" element={<OrderDetailPage />} />
 
-            <Route path="/" element={<Navigate to="/users" replace />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
