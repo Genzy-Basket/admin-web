@@ -13,10 +13,10 @@ const FormTextarea = ({
   return (
     <div className={className}>
       {label && (
-        <label className="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
-          {Icon && <Icon size={14} />}
+        <label className="flex items-center gap-1 text-sm font-semibold text-slate-700 mb-1.5">
+          {Icon && <Icon size={14} className="text-slate-400" />}
           {label}
-          {required && <span className="text-red-500">*</span>}
+          {required && <span className="text-rose-500">*</span>}
         </label>
       )}
       <textarea
@@ -26,8 +26,8 @@ const FormTextarea = ({
         placeholder={placeholder}
         required={required}
         rows={rows}
-        className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none ${
-          monospace ? "font-mono text-sm" : ""
+        className={`w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none resize-none transition-all text-sm ${
+          monospace ? "font-mono" : ""
         }`}
       />
     </div>

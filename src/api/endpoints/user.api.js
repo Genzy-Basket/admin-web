@@ -12,6 +12,11 @@ export const userApi = {
     return response.data;
   },
 
+  getById: async (userId) => {
+    const response = await axiosClient.get(`/user/admin/${userId}`);
+    return response.data; // { success, data: user }
+  },
+
   // Admin Actions
   approve: async (userId) => {
     const response = await axiosClient.patch(`/user/admin/${userId}/approve`);

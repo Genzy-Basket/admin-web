@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShoppingBag,
@@ -15,8 +15,10 @@ import {
   Loader2,
   X,
   CalendarDays,
+  Navigation,
 } from "lucide-react";
 import { useOrders } from "../context/OrderContext";
+import { useUsers } from "../../user/context/UserContext";
 import { usePageMeta } from "../../../context/PageHeaderContext";
 import { PageContainer, Badge } from "../../../components/shared";
 
@@ -45,17 +47,6 @@ const fmtDate = (dateStr) => {
   return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 };
 
-const toDateInput = (d) => d.toISOString().slice(0, 10);
-
-const getDefaultDates = () => {
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  return {
-    startDate: toDateInput(yesterday),
-    endDate: toDateInput(today),
-  };
-};
 
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
@@ -93,7 +84,7 @@ const StatCard = ({ label, value, sub, icon: Icon, color }) => (
 );
 
 // ── Mobile order card ─────────────────────────────────────────────────────────
-const OrderCard = ({ order, onClick }) => (
+const OrderCard = ({ order, onClick, mapsUrl }) => (
   <div
     onClick={onClick}
     className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm cursor-pointer active:scale-[0.99] transition-transform"
@@ -134,32 +125,45 @@ const OrderCard = ({ order, onClick }) => (
         </p>
       </div>
     </div>
+    {mapsUrl && (
+      <div className="mt-3 pt-3 border-t border-slate-100">
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#009661] text-white text-xs font-bold rounded-lg hover:bg-[#007d51] transition-all"
+        >
+          <Navigation className="w-3 h-3" />
+          Directions
+        </a>
+      </div>
+    )}
   </div>
 );
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
-const DEFAULT_DATES = getDefaultDates();
-
 const OrdersPage = () => {
   const navigate = useNavigate();
   const { orders, stats, pagination, loading, fetchOrders, fetchStats, bulkOutForDelivery } = useOrders();
+  const { fetchUserById } = useUsers();
+
+  // userId → Google Maps URL (populated lazily as orders load)
+  const [coordsMap, setCoordsMap] = useState({});
+  const fetchedIds = useRef(new Set());
 
   const [filters, setFilters] = useState({
     page: 1,
     limit: 20,
     status: "",
     search: "",
-    startDate: DEFAULT_DATES.startDate,
-    endDate: DEFAULT_DATES.endDate,
+    startDate: "",
+    endDate: "",
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [bulking, setBulking] = useState(false);
   const [bulkResult, setBulkResult] = useState(null);
-
-  const isDefaultDates =
-    filters.startDate === DEFAULT_DATES.startDate &&
-    filters.endDate === DEFAULT_DATES.endDate;
 
   // Extract only the date window — stats endpoint only needs these
   const dateParams = useCallback(
@@ -190,6 +194,25 @@ const OrdersPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Lazily resolve user coords for each order as the list changes
+  useEffect(() => {
+    if (!orders.length) return;
+    orders.forEach((order) => {
+      const uid = order.userId?._id;
+      if (!uid || fetchedIds.current.has(uid)) return;
+      fetchedIds.current.add(uid);
+      fetchUserById(uid).then((user) => {
+        const coords = user?.address?.geoLocation?.coordinates;
+        if (!coords || coords.length < 2) return;
+        const [lng, lat] = coords;
+        setCoordsMap((prev) => ({
+          ...prev,
+          [uid]: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+        }));
+      });
+    });
+  }, [orders, fetchUserById]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const next = { ...filters, page: 1 };
@@ -211,7 +234,7 @@ const OrdersPage = () => {
   };
 
   const handleResetDates = () => {
-    const next = { ...filters, ...DEFAULT_DATES, page: 1 };
+    const next = { ...filters, startDate: "", endDate: "", page: 1 };
     setFilters(next);
     setShowDatePicker(false);
     fetchOrders(clean(next));
@@ -311,21 +334,23 @@ const OrdersPage = () => {
           <button
             onClick={() => setShowDatePicker((v) => !v)}
             className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold rounded-xl border transition-all ${
-              !isDefaultDates
+              filters.startDate || filters.endDate
                 ? "bg-[#009661] text-white border-[#009661]"
                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
             }`}
           >
             <CalendarDays className="w-4 h-4" />
             <span className="hidden sm:inline">
-              {isDefaultDates ? "Today & Yesterday" : `${filters.startDate} – ${filters.endDate}`}
+              {filters.startDate || filters.endDate
+                ? `${filters.startDate} – ${filters.endDate}`
+                : "All dates"}
             </span>
           </button>
-          {!isDefaultDates && (
+          {(filters.startDate || filters.endDate) && (
             <button
               onClick={handleResetDates}
               className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-all"
-              title="Reset to today & yesterday"
+              title="Clear date filter"
             >
               <X className="w-4 h-4" />
             </button>
@@ -399,7 +424,12 @@ const OrdersPage = () => {
           {/* Mobile — cards */}
           <div className="lg:hidden space-y-3">
             {orders.map((order) => (
-              <OrderCard key={order._id} order={order} onClick={() => navigate(`/orders/${order.orderId}`)} />
+              <OrderCard
+                key={order._id}
+                order={order}
+                onClick={() => navigate(`/orders/${order.orderId}`)}
+                mapsUrl={coordsMap[order.userId?._id]}
+              />
             ))}
           </div>
 

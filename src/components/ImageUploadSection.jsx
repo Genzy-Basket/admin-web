@@ -77,7 +77,7 @@ const ImageUploadSection = ({
 
         {/* Upload Button */}
         <div>
-          <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer transition-colors">
+          <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#009661] hover:bg-[#007d51] text-white rounded-lg font-semibold cursor-pointer transition-colors">
             <Upload size={18} />
             {imageFile ? "Change Image" : "Upload New Image"}
             <input

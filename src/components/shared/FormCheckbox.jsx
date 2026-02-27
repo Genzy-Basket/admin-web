@@ -10,7 +10,7 @@ const FormCheckbox = ({
     green: "text-green-600 focus:ring-green-500",
     orange: "text-orange-600 focus:ring-orange-500",
     blue: "text-blue-600 focus:ring-blue-500",
-    indigo: "text-indigo-600 focus:ring-indigo-500",
+    indigo: "text-[#009661] focus:ring-[#009661]/30",
   };
 
   return (

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 import { userApi } from "../../../api/endpoints/user.api";
+import { errorBus } from "../../../api/errorBus";
 
 const UserContext = createContext();
 
@@ -19,7 +20,7 @@ export const UserProvider = ({ children }) => {
         setUsers(res.data);
         setPagination(res.pagination);
       } catch (err) {
-        console.error("Failed to fetch users", err);
+        errorBus.emit(err.message || "Failed to fetch users", "error");
       } finally {
         setLoading(false);
       }
@@ -28,21 +29,32 @@ export const UserProvider = ({ children }) => {
   );
 
   const fetchStats = async () => {
-    const res = await userApi.getStats();
-    setStats(res.data);
+    try {
+      const res = await userApi.getStats();
+      setStats(res.data);
+    } catch (err) {
+      errorBus.emit(err.message || "Failed to fetch user stats", "error");
+    }
   };
 
-  const handleAction = async (actionFn, ...args) => {
+  const fetchUserById = useCallback(async (userId) => {
+    const cached = users.find((u) => u._id === userId);
+    if (cached) return cached;
     try {
-      const res = await actionFn(...args);
-      // Optimistically update or just refresh list
-      setUsers((prev) =>
-        prev.map((u) => (u._id === res.data._id ? res.data : u)),
-      );
-      return res;
+      const res = await userApi.getById(userId);
+      return res.data;
     } catch (err) {
-      throw err;
+      errorBus.emit(err.message || "Failed to fetch user", "error");
+      return null;
     }
+  }, [users]);
+
+  const handleAction = async (actionFn, ...args) => {
+    const res = await actionFn(...args);
+    setUsers((prev) =>
+      prev.map((u) => (u._id === res.data._id ? res.data : u)),
+    );
+    return res;
   };
 
   const value = {
@@ -52,6 +64,7 @@ export const UserProvider = ({ children }) => {
     stats,
     fetchUsers,
     fetchStats,
+    fetchUserById,
     approveUser: (id) => handleAction(userApi.approve, id),
     rejectUser: (id, reason) => handleAction(userApi.reject, id, reason),
     suspendUser: (id, reason) => handleAction(userApi.suspend, id, reason),

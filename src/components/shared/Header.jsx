@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, RefreshCw, Bell } from "lucide-react";
+import { Menu, RefreshCw } from "lucide-react";
 import { usePageHeader } from "../../context/PageHeaderContext";
 
 export const Header = ({ setIsSidebarOpen }) => {
@@ -24,7 +24,7 @@ export const Header = ({ setIsSidebarOpen }) => {
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className="p-2 rounded-xl bg-slate-50 text-slate-600 lg:hidden hover:bg-slate-100 transition-colors border border-slate-200/50 shrink-0"
+          className="p-2 rounded-xl bg-slate-50 text-slate-600 lg:hidden hover:bg-emerald-50 hover:text-[#009661] transition-colors border border-slate-200/50 shrink-0"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -35,18 +35,13 @@ export const Header = ({ setIsSidebarOpen }) => {
         )}
       </div>
 
-      {/* Right — bell + conditional refresh */}
+      {/* Right — conditional refresh */}
       <div className="flex items-center gap-2 shrink-0">
-        <button className="p-2 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-all relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
-        </button>
-
         {hasRefresh && (
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="group flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all duration-300 border border-indigo-100 active:scale-95 disabled:opacity-50"
+            className="group flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-[#009661] hover:bg-[#009661] hover:text-white transition-all duration-300 border border-emerald-200 active:scale-95 disabled:opacity-50"
           >
             <RefreshCw
               className={`w-4 h-4 ${

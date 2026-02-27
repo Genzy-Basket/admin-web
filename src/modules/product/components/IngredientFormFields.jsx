@@ -38,7 +38,7 @@ const IngredientFormFields = ({ formData, onChange }) => {
             type="checkbox"
             checked={formData.isVeg}
             onChange={handleChange("isVeg")}
-            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            className="w-4 h-4 rounded border-slate-300 text-[#009661] focus:ring-[#009661]/30"
           />
           Vegetarian
         </label>
@@ -47,7 +47,7 @@ const IngredientFormFields = ({ formData, onChange }) => {
             type="checkbox"
             checked={formData.available}
             onChange={handleChange("available")}
-            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            className="w-4 h-4 rounded border-slate-300 text-[#009661] focus:ring-[#009661]/30"
           />
           Available
         </label>

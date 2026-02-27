@@ -11,8 +11,8 @@ const ProgressBar = ({
       fill: "bg-orange-500",
     },
     secondary: {
-      bg: "bg-indigo-100",
-      fill: "bg-indigo-500",
+      bg: "bg-emerald-100",
+      fill: "bg-emerald-500",
     },
     success: {
       bg: "bg-emerald-100",

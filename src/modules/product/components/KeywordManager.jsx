@@ -39,8 +39,8 @@ const KeywordManager = ({
           type="button"
           onClick={handleAdd}
           disabled={!input.trim()}
-          // Added solid indigo background and rounded-xl for modern look
-          className="px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 text-white rounded-xl transition-colors flex items-center justify-center shadow-sm"
+          
+          className="px-4 bg-[#009661] hover:bg-[#007d51] disabled:bg-slate-200 text-white rounded-xl transition-colors flex items-center justify-center shadow-sm"
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -51,7 +51,7 @@ const KeywordManager = ({
           {keywords.map((keyword, index) => (
             <span
               key={index}
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold ring-1 ring-indigo-100"
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-[#007d51] rounded-lg text-xs font-bold ring-1 ring-emerald-100"
             >
               {keyword}
               <button

@@ -3,15 +3,15 @@ const PageContainer = ({
   title,
   icon: Icon,
   maxWidth = "7xl",
-  gradient = "orange",
+  gradient = "slate",
   className = "",
 }) => {
   const gradientClasses = {
     orange: "from-orange-50 to-amber-50",
-    blue: "from-blue-50 to-indigo-50",
+    blue: "from-blue-50 to-emerald-50",
     green: "from-green-50 to-emerald-50",
     purple: "from-purple-50 to-pink-50",
-    slate: "from-slate-50 via-indigo-50 to-slate-100",
+    slate: "from-slate-50 via-emerald-50 to-slate-100",
   };
 
   const maxWidthClasses = {
@@ -35,7 +35,7 @@ const PageContainer = ({
       <div className={`${maxWidthClasses[maxWidth]} mx-auto`}>
         {title && (
           <div className="flex items-center gap-3 mb-6">
-            {Icon && <Icon size={32} className="text-orange-600" />}
+            {Icon && <Icon size={32} className="text-[#009661]" />}
             <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
           </div>
         )}

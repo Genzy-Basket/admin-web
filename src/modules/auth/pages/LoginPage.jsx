@@ -1,12 +1,12 @@
-// src/modules/auth/pages/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Leaf, Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { authApi } from "../../../api/endpoints/auth.api";
 import { useAuth } from "../context/AuthContext";
-import { FormInput, Button, Card } from "../../../components/shared";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,61 +15,121 @@ const LoginPage = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
     try {
       const response = await authApi.login(formData);
       login(response.data, response.token);
       navigate("/users");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again.",
-      );
+      setError(err.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Brand */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">Admin Login</h1>
-          <p className="text-gray-600">Access the Food Admin Panel</p>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#009661] rounded-2xl mb-4 shadow-lg shadow-[#009661]/30">
+            <Leaf className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            FreshMart<span className="text-[#009661]">.</span>
+          </h1>
+          <p className="text-slate-500 mt-1 text-sm font-medium">Admin Dashboard</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormInput
-            label="Email Address"
-            name="email"
-            type="email"
-            placeholder="admin@food.com"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <FormInput
-            label="Password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+        {/* Card */}
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+          <h2 className="text-xl font-black text-slate-800 mb-6">Sign in to your account</h2>
 
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
+            <div>
+              <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 mb-1.5">
+                <Mail size={14} className="text-slate-400" />
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="admin@freshmart.com"
+                required
+                autoComplete="email"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none transition-all text-sm"
+              />
+            </div>
 
-          <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
-      </Card>
+            {/* Password */}
+            <div>
+              <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 mb-1.5">
+                <Lock size={14} className="text-slate-400" />
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  className="w-full px-4 py-3 pr-11 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none transition-all text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="flex items-start gap-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700 font-medium">
+                <span className="mt-0.5 shrink-0">⚠</span>
+                {error}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 bg-[#009661] text-white font-bold rounded-xl hover:bg-[#007d51] transition-all shadow-md shadow-[#009661]/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Signing in…
+                </>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-xs text-slate-400 mt-6">
+          FreshMart Admin · Authorized Access Only
+        </p>
+      </div>
     </div>
   );
 };

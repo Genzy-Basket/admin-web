@@ -1,74 +1,61 @@
 import axios from "axios";
+import { errorBus } from "./errorBus";
+
+const PUBLIC_ENDPOINTS = ["/auth/admin/login", "/auth/register", "/auth/login"];
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
+  timeout: 15000,
 });
 
-axiosClient.interceptors.request.use(
-  (config) => {
-    const publicEndpoints = [
-      "/auth/admin/login",
-      "/auth/register",
-      "/auth/login",
-    ];
-    const isPublicEndpoint = publicEndpoints.some(
-      (endpoint) => config.url === endpoint || config.url?.endsWith(endpoint),
-    );
+// ── Request: attach token ─────────────────────────────────────────────────────
+axiosClient.interceptors.request.use((config) => {
+  const isPublic = PUBLIC_ENDPOINTS.some(
+    (ep) => config.url === ep || config.url?.endsWith(ep),
+  );
 
-    if (!isPublicEndpoint) {
-      const adminToken = localStorage.getItem("adminToken");
-      const userToken = localStorage.getItem("token");
-
-      // Use admin token if available, otherwise use user token
-      const token = adminToken || userToken;
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      } else {
-        alert("No token found");
-      }
-    } else {
+  if (!isPublic) {
+    const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+  }
 
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
+  return config;
+});
 
-// Response interceptor to handle errors
+// ── Response: normalize errors and surface them via errorBus ──────────────────
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Unauthorized - clear tokens
-      console.log("401 Unauthorized - clearing tokens");
+    let message = "An unexpected error occurred.";
 
-      // Only redirect if not already on login page
-      const isLoginPage = window.location.pathname.includes("/login");
+    if (error.response) {
+      const { status, data } = error.response;
+      message = data?.message || message;
 
-      if (!isLoginPage) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("admin");
-
-        // Redirect to appropriate login page
-        const isAdminRoute = window.location.pathname.includes("/admin");
-        window.location.href = isAdminRoute ? "/admin/login" : "/login";
+      if (status === 401) {
+        const isLoginPage = window.location.pathname.includes("/login");
+        if (!isLoginPage) {
+          // Let ToastProvider's auth:logout listener handle the redirect + cleanup
+          window.dispatchEvent(new Event("auth:logout"));
+          return Promise.reject(new Error(message));
+        }
       }
-    } else if (error.response?.status === 403) {
-      // Forbidden - user doesn't have permission
-      console.log("403 Forbidden - insufficient permissions");
-      // Optionally show a notification
-      // toast.error("You don't have permission to perform this action");
-    } else if (error.response?.status === 404) {
-      console.log("404 Not Found");
+
+      if (status === 403) {
+        message = data?.message || "You don't have permission to perform this action.";
+      }
+    } else if (error.request) {
+      message = "Network error. Please check your connection.";
     }
 
-    return Promise.reject(error);
+    const normalized = new Error(message);
+    normalized.status = error.response?.status;
+    normalized.raw = error;
+
+    return Promise.reject(normalized);
   },
 );
 

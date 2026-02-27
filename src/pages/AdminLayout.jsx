@@ -15,7 +15,6 @@ const FAB = () => {
   useEffect(() => {
     const el = mainRef.current;
     if (!el) return;
-
     const handler = () => {
       const y = el.scrollTop;
       if (y < 80) {
@@ -25,25 +24,22 @@ const FAB = () => {
       }
       lastScrollY.current = y;
     };
-
     el.addEventListener("scroll", handler, { passive: true });
     return () => el.removeEventListener("scroll", handler);
   }, [mainRef]);
 
-  // Reset visibility on page change
   useEffect(() => {
     setVisible(true);
     lastScrollY.current = 0;
   }, [fab]);
 
   if (!fab) return null;
-
   const Icon = fab.icon;
 
   return (
     <button
       onClick={fab.onClick}
-      className={`fixed bottom-6 right-6 z-40 lg:hidden flex items-center gap-2 px-4 py-3.5 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-300/50 font-bold text-sm transition-all duration-300 ${
+      className={`fixed bottom-6 right-6 z-40 lg:hidden flex items-center gap-2 px-4 py-3.5 bg-[#009661] text-white rounded-2xl shadow-lg shadow-[#009661]/30 font-bold text-sm transition-all duration-300 ${
         visible
           ? "translate-y-0 opacity-100"
           : "translate-y-24 opacity-0 pointer-events-none"
@@ -55,7 +51,7 @@ const FAB = () => {
   );
 };
 
-// ── Inner layout — must be a child of PageHeaderProvider ─────────────────────
+// ── Inner layout ──────────────────────────────────────────────────────────────
 const LayoutInner = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { logout, user } = useAuth();
@@ -74,14 +70,14 @@ const LayoutInner = () => {
       {/* Mobile overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 h-full shrink-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 h-full shrink-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -93,15 +89,13 @@ const LayoutInner = () => {
         />
       </aside>
 
-      {/* Main content area */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <Header setIsSidebarOpen={setIsSidebarOpen} />
-
         <main
           ref={mainRef}
           className="flex-1 overflow-y-auto bg-[#F8FAFC] custom-scrollbar"
         >
-          {/* Extra bottom padding on mobile so FAB never overlaps content */}
           <div className="p-4 sm:p-6 lg:p-10 pb-28 lg:pb-10">
             <div className="max-w-7xl mx-auto animate-in">
               <Outlet />
@@ -110,7 +104,6 @@ const LayoutInner = () => {
         </main>
       </div>
 
-      {/* Scroll-aware floating action button (mobile only, lg:hidden) */}
       <FAB />
 
       <style
@@ -129,7 +122,6 @@ const LayoutInner = () => {
   );
 };
 
-// ── AdminLayout — provides page-header context to all children ────────────────
 const AdminLayout = () => (
   <PageHeaderProvider>
     <LayoutInner />

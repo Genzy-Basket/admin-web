@@ -33,7 +33,7 @@ const ActionButtons = ({
         <>
           <button
             onClick={onEdit}
-            className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all"
+            className="p-2 bg-emerald-50 text-[#009661] rounded-lg hover:bg-[#009661] hover:text-white transition-all"
             title="Edit"
           >
             <Pencil size={16} />

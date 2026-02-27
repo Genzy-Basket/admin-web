@@ -57,7 +57,7 @@ const ProductModal = ({ product, isOpen, onClose }) => {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-black text-indigo-600">₹{config.price}</p>
+                  <p className="font-black text-[#009661]">₹{config.price}</p>
                   {config.mrp > config.price && (
                     <p className="text-[10px] text-slate-400 line-through">
                       MRP ₹{config.mrp}
@@ -75,7 +75,7 @@ const ProductModal = ({ product, isOpen, onClose }) => {
             {product.keywords.map((k, i) => (
               <span
                 key={i}
-                className="flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded"
+                className="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-[#009661] text-[10px] font-bold rounded"
               >
                 <Tag size={10} /> {k}
               </span>

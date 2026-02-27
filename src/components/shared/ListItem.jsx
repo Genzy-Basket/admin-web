@@ -15,7 +15,7 @@ const ListItem = ({
     success: "bg-emerald-50 border-emerald-200",
     error: "bg-rose-50 border-rose-200",
     warning: "bg-amber-50 border-amber-200",
-    info: "bg-indigo-50 border-indigo-200",
+    info: "bg-emerald-50 border-emerald-200",
   };
 
   return (

@@ -50,7 +50,7 @@ const ProductCard = memo(({ product, onView }) => {
           <p className="text-xs text-slate-500 mb-2">{product.category}</p>
 
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center text-indigo-700 font-bold">
+            <div className="flex items-center text-[#007d51] font-bold">
               <IndianRupee size={14} />
               <span>{mainConfig?.price || 0}</span>
             </div>
@@ -68,7 +68,7 @@ const ProductCard = memo(({ product, onView }) => {
             </button>
             <button
               onClick={() => navigate(`/products/edit/${product._id}`)}
-              className="flex-1 p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors flex justify-center"
+              className="flex-1 p-2 bg-emerald-50 hover:bg-emerald-100 text-[#009661] rounded-lg transition-colors flex justify-center"
             >
               <Edit size={16} />
             </button>

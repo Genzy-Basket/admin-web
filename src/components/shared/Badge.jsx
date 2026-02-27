@@ -9,13 +9,13 @@ const Badge = ({
   className = "",
 }) => {
   const variantClasses = {
-    primary: "bg-orange-500 text-white",
+    primary:   "bg-[#009661] text-white",
     secondary: "bg-slate-100 text-slate-700",
-    success: "bg-emerald-500 text-white",
-    warning: "bg-amber-500 text-white",
-    danger: "bg-rose-500 text-white",
-    info: "bg-blue-500 text-white",
-    outline: "bg-white border-2 border-orange-500 text-orange-700",
+    success:   "bg-emerald-500 text-white",
+    warning:   "bg-amber-500 text-white",
+    danger:    "bg-rose-500 text-white",
+    info:      "bg-sky-500 text-white",
+    outline:   "bg-white border-2 border-[#009661] text-[#009661]",
   };
 
   const sizeClasses = {
@@ -29,7 +29,7 @@ const Badge = ({
     <span
       className={`
         inline-flex items-center gap-1
-        font-bold rounded-full shadow-sm
+        font-bold rounded-full
         ${variantClasses[variant]}
         ${sizeClasses[size]}
         ${className}

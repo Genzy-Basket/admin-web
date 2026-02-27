@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { ToastProvider } from "./components/ToastProvider";
 import { AuthProvider } from "./modules/auth/context/AuthContext";
 import { UserProvider } from "./modules/user/context/UserContext";
 import { ProductProvider } from "./modules/product/context/ProductContext";
@@ -22,40 +23,42 @@ import DashboardPage from "./modules/dashboard/pages/DashboardPage";
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            element={
-              <ProtectedRoute>
-                <UserProvider>
-                  <ProductProvider>
-                    <OrderProvider>
-                      <AdminLayout />
-                    </OrderProvider>
-                  </ProductProvider>
-                </UserProvider>
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/products/add" element={<NewProductPage />} />
+    <ToastProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
             <Route
-              path="/products/edit/:productId"
-              element={<EditProductPage />}
-            />
-            <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/orders/:orderId" element={<OrderDetailPage />} />
+              element={
+                <ProtectedRoute>
+                  <UserProvider>
+                    <ProductProvider>
+                      <OrderProvider>
+                        <AdminLayout />
+                      </OrderProvider>
+                    </ProductProvider>
+                  </UserProvider>
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/add" element={<NewProductPage />} />
+              <Route
+                path="/products/edit/:productId"
+                element={<EditProductPage />}
+              />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/orders/:orderId" element={<OrderDetailPage />} />
 
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

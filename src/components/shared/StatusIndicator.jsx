@@ -27,8 +27,8 @@ const StatusIndicator = ({
     },
     processing: {
       icon: Loader2,
-      bg: "bg-indigo-500",
-      text: "text-indigo-600",
+      bg: "bg-emerald-500",
+      text: "text-[#009661]",
       label: "Processing",
       animate: true,
     },

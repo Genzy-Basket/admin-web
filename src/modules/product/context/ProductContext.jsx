@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { productApi } from "../../../api/endpoints/product.api";
 import { mediaApi } from "../../../api/endpoints/media.api";
+import { errorBus } from "../../../api/errorBus";
 
 const ProductContext = createContext(null);
 
@@ -9,8 +10,6 @@ export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // src/modules/product/context/ProductContext.jsx
 
   const fetchProducts = useCallback(
     async (filters = {}, force = false) => {
@@ -21,7 +20,9 @@ export const ProductProvider = ({ children }) => {
         const response = await productApi.getAll(filters);
         setProducts(response.data || []);
       } catch (err) {
-        setError("Failed to fetch products");
+        const message = err.message || "Failed to fetch products";
+        setError(message);
+        errorBus.emit(message, "error");
       } finally {
         setLoading(false);
       }
@@ -38,8 +39,6 @@ export const ProductProvider = ({ children }) => {
       const response = await productApi.add({ ...itemData, imageUrl });
       setProducts((prev) => [...prev, response.data]);
       return response.data;
-    } catch (err) {
-      throw err;
     } finally {
       setLoading(false);
     }
@@ -56,8 +55,6 @@ export const ProductProvider = ({ children }) => {
         prev.map((p) => (p._id === id ? response.data : p)),
       );
       return response.data;
-    } catch (err) {
-      throw err;
     } finally {
       setLoading(false);
     }
@@ -65,11 +62,9 @@ export const ProductProvider = ({ children }) => {
 
   const getProductById = useCallback(
     async (id) => {
-      // Check local cache
       const localProduct = products.find((p) => p._id === id);
       if (localProduct) return localProduct;
 
-      // Otherwise fetch
       setLoading(true);
       try {
         const response = await productApi.getById(id);
@@ -82,13 +77,15 @@ export const ProductProvider = ({ children }) => {
   );
 
   const deleteProduct = async (id) => {
-    setLoading(true); // Always toggle loading for consistency
+    setLoading(true);
     try {
       await productApi.delete(id);
       setProducts((prev) => prev.filter((p) => (p._id || p.id) !== id));
       return true;
     } catch (err) {
-      setError("Failed to delete product");
+      const message = err.message || "Failed to delete product";
+      setError(message);
+      errorBus.emit(message, "error");
       throw err;
     } finally {
       setLoading(false);
