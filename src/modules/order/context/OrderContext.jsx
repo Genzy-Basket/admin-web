@@ -13,7 +13,6 @@ export const OrderProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const fetchOrders = useCallback(async (params = {}, force = false) => {
-    if (!force && orders.length > 0 && Object.keys(params).length === 0) return;
     setLoading(true);
     setError(null);
     try {
@@ -27,7 +26,7 @@ export const OrderProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [orders.length]);
+  }, []);
 
   const fetchStats = useCallback(async (params = {}) => {
     try {
