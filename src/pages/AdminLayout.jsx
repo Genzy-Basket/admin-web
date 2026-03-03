@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../modules/auth/context/AuthContext";
-import { Users, Package, FilePlus, ShoppingBag, LayoutDashboard } from "lucide-react";
+import { Users, Package, FilePlus, ShoppingBag, LayoutDashboard, PackageCheck } from "lucide-react";
 import { Header } from "../components/shared/Header";
 import { Sidebar } from "../components/shared/Sidebar";
 import { PageHeaderProvider, usePageHeader } from "../context/PageHeaderContext";
@@ -63,6 +63,7 @@ const LayoutInner = () => {
     { name: "Inventory",   href: "/products",     icon: Package,         end: true },
     { name: "Add Product", href: "/products/add", icon: FilePlus,        end: true },
     { name: "Orders",      href: "/orders",       icon: ShoppingBag,     end: true },
+    { name: "Packing",     href: "/packing",      icon: PackageCheck,    end: true },
   ];
 
   return (

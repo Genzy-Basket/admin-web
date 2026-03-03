@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Modal, Button, FormTextarea, Badge } from "../../../components/shared";
 import { useUsers } from "../context/UserContext";
+import { errorBus } from "../../../api/errorBus";
 
 const UserModal = ({ user, isOpen, onClose }) => {
   const { approveUser, rejectUser, suspendUser, reactivateUser } = useUsers();
@@ -29,7 +30,7 @@ const UserModal = ({ user, isOpen, onClose }) => {
       setReason("");
       onClose();
     } catch (err) {
-      console.error(err);
+      errorBus.emit(err.message || "Action failed", "error");
     } finally {
       setSubmitting(false);
     }

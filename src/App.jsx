@@ -19,6 +19,7 @@ import NewProductPage from "./modules/product/pages/NewProductPage";
 import EditProductPage from "./modules/product/pages/EditProductPage";
 import OrdersPage from "./modules/order/pages/OrdersPage";
 import OrderDetailPage from "./modules/order/pages/OrderDetailPage";
+import PackingPage from "./modules/order/pages/PackingPage";
 import DashboardPage from "./modules/dashboard/pages/DashboardPage";
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
               />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/orders/:orderId" element={<OrderDetailPage />} />
+              <Route path="/packing" element={<PackingPage />} />
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>

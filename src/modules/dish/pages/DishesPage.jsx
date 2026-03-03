@@ -52,7 +52,6 @@ function ManageDish() {
       const response = await dishApi.getAll(activeFilters);
       setDishes(response.data || []);
     } catch (error) {
-      console.error("Error fetching dishes:", error);
       alert("Failed to fetch dishes");
     } finally {
       setLoading(false);
@@ -70,7 +69,6 @@ function ManageDish() {
       const response = await dishApi.search(searchTerm);
       setDishes(response.data || []);
     } catch (error) {
-      console.error("Error searching dishes:", error);
       alert("Search failed");
     } finally {
       setLoading(false);
@@ -85,7 +83,6 @@ function ManageDish() {
       alert("Dish deleted successfully");
       fetchDishes();
     } catch (error) {
-      console.error("Error deleting dish:", error);
       alert("Failed to delete dish");
     }
   };

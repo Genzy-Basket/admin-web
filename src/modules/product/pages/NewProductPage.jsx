@@ -12,7 +12,7 @@ import {
   PRODUCT_CATEGORIES,
   PRODUCT_UNITS,
   INITIAL_FORM_STATE,
-} from "../../../config/constants";
+} from "../../../constants";
 import { usePageMeta } from "../../../context/PageHeaderContext";
 import KeywordManager from "../components/KeywordManager";
 import ImageUploadSection from "../../../components/ImageUploadSection";
@@ -69,7 +69,6 @@ const NewProductPage = () => {
     if (!imageFile && !formData.imageUrl) {
       return toast.error("Please provide an image file or URL");
     }
-    console.log("Submitting MRP check:", formData.priceConfigs[0].mrp);
     addToQueue(formData, imageFile);
     setFormData(INITIAL_FORM_STATE);
     setImageFile(null);

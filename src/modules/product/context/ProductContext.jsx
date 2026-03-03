@@ -39,6 +39,11 @@ export const ProductProvider = ({ children }) => {
       const response = await productApi.add({ ...itemData, imageUrl });
       setProducts((prev) => [...prev, response.data]);
       return response.data;
+    } catch (err) {
+      const message = err.message || "Failed to add product";
+      setError(message);
+      errorBus.emit(message, "error");
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -55,6 +60,11 @@ export const ProductProvider = ({ children }) => {
         prev.map((p) => (p._id === id ? response.data : p)),
       );
       return response.data;
+    } catch (err) {
+      const message = err.message || "Failed to update product";
+      setError(message);
+      errorBus.emit(message, "error");
+      throw err;
     } finally {
       setLoading(false);
     }

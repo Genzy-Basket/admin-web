@@ -18,7 +18,7 @@ import {
   FormTextarea,
   FormSelect,
 } from "../../../components/shared";
-import { PRODUCT_CATEGORIES, PRODUCT_UNITS } from "../../../config/constants";
+import { PRODUCT_CATEGORIES, PRODUCT_UNITS } from "../../../constants";
 import { usePageMeta } from "../../../context/PageHeaderContext";
 import KeywordManager from "../components/KeywordManager";
 import PriceConfigForm from "../components/PriceConfigForm";

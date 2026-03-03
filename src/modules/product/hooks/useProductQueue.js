@@ -36,7 +36,7 @@ export const useProductQueue = () => {
               ? {
                   ...t,
                   status: "error",
-                  message: err.response?.data?.message || "Failed",
+                  message: err.message || "Failed",
                 }
               : t,
           ),

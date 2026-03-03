@@ -187,7 +187,6 @@ function CreateDishForm() {
       // Submit to API
       const response = await dishApi.create(dishData);
 
-      console.log("Dish created successfully:", response);
       alert("Dish created successfully!");
 
       // Reset form
@@ -203,7 +202,6 @@ function CreateDishForm() {
       });
       removeImage();
     } catch (error) {
-      console.error("Error creating dish:", error);
       alert(
         error.response?.data?.message ||
           "Failed to create dish. Please try again.",

@@ -27,4 +27,27 @@ export const PRODUCT_UNITS = [
   "tray",
 ];
 
-export const BELLY_SIZE = ["small", "medium", "large", "extra large"];
+export const BELLY_SIZE = ["small", "standard", "hearty"];
+
+export const INITIAL_FORM_STATE = {
+  name: "",
+  brand: "",
+  description: "",
+  category: "vegetables",
+  subCategory: "",
+  isVeg: true,
+  isFMCG: false,
+  available: true,
+  taxRate: 0,
+  keywords: [],
+  priceConfigs: [
+    {
+      displayLabel: "Small Pack",
+      quantity: 1,
+      unit: "kg",
+      price: "",
+      mrp: "",
+      stock: 0,
+    },
+  ],
+};

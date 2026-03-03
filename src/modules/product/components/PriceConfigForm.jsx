@@ -7,7 +7,7 @@ import {
   FormSelect,
 } from "../../../components/shared";
 
-import { PRODUCT_UNITS } from "../../../config/constants";
+import { PRODUCT_UNITS } from "../../../constants";
 
 const PriceConfigForm = ({
   configs = [],
