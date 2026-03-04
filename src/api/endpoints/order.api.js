@@ -40,6 +40,14 @@ export const orderApi = {
     return res.data; // { success, data: order }
   },
 
+  /** Admin confirms cash was collected for a COD order */
+  confirmCodCollection: async (orderId, adminNotes = null) => {
+    const res = await axiosClient.post(`/admin/orders/${orderId}/confirm-cod`, {
+      adminNotes,
+    });
+    return res.data; // { success, data: order }
+  },
+
   /** Mark all confirmed/processing orders as out_for_delivery in one shot */
   bulkOutForDelivery: async () => {
     const res = await axiosClient.post("/admin/orders/bulk-out-for-delivery");

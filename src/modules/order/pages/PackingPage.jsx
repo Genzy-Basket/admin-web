@@ -27,8 +27,8 @@ const aggregateItems = (orders) => {
   const map = {};
   for (const order of orders) {
     for (const item of order.items ?? []) {
-      const name = item.productId?.name ?? item.name ?? "Unknown";
-      const unit = item.unit ?? "";
+      const name = item.productSnapshot?.name ?? item.productId?.name ?? "Unknown";
+      const unit = item.value && item.unit ? `${item.value} ${item.unit}` : item.unit ?? "";
       const key  = `${name}__${unit}`;
       if (!map[key]) map[key] = { name, unit, qty: 0 };
       map[key].qty += item.quantity ?? 0;
@@ -73,8 +73,8 @@ const PackingOrderCard = ({ order, onClick }) => (
     <div className="space-y-1">
       {order.items?.map((item, i) => (
         <div key={i} className="flex items-center justify-between text-xs">
-          <span className="text-slate-600">{item.productId?.name ?? item.name}</span>
-          <span className="font-bold text-slate-700">{item.quantity} {item.unit}</span>
+          <span className="text-slate-600">{item.productSnapshot?.name ?? item.productId?.name ?? "Unknown"}</span>
+          <span className="font-bold text-slate-700">{item.quantity} x {item.value} {item.unit}</span>
         </div>
       ))}
     </div>

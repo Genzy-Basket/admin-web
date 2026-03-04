@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   XCircle,
   Navigation,
+  Banknote,
+  AlertTriangle,
 } from "lucide-react";
 import { useOrders } from "../context/OrderContext";
 import { useUsers } from "../../user/context/UserContext";
@@ -68,7 +70,7 @@ const Section = ({ title, icon: Icon, children }) => (
 const OrderDetailPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { fetchOrder, updateStatus, cancelOrder, loading, error } = useOrders();
+  const { fetchOrder, updateStatus, confirmCodCollection, cancelOrder, loading, error } = useOrders();
   const { fetchUserById } = useUsers();
 
   const [order, setOrder] = useState(null);
@@ -148,6 +150,23 @@ const OrderDetailPage = () => {
       setCancelError(result.message);
     }
   };
+
+  // ── Confirm COD cash collection ────────────────────────────────────
+  const [confirmingCod, setConfirmingCod] = useState(false);
+
+  const handleConfirmCod = async () => {
+    setConfirmingCod(true);
+    const result = await confirmCodCollection(order.orderId, adminNotes || null);
+    setConfirmingCod(false);
+    if (result.success) {
+      setOrder(result.data);
+    }
+  };
+
+  const isCodPending =
+    order?.payment?.method === "cod" &&
+    !order?.payment?.codCollectedAt &&
+    order?.orderStatus === "delivered";
 
   const isFinal = ["delivered", "cancelled", "refunded"].includes(
     order?.orderStatus,
@@ -360,7 +379,40 @@ const OrderDetailPage = () => {
               {order.payment?.failureReason && (
                 <InfoRow label="Failure" value={order.payment.failureReason} />
               )}
+              {order.payment?.codCollectedAt && (
+                <InfoRow
+                  label="Cash Collected"
+                  value={new Date(order.payment.codCollectedAt).toLocaleString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, day: "numeric", month: "short" })}
+                />
+              )}
             </div>
+
+            {/* COD collection confirmation */}
+            {isCodPending && (
+              <button
+                onClick={handleConfirmCod}
+                disabled={confirmingCod}
+                className="w-full mt-4 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+              >
+                {confirmingCod ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Banknote className="w-4 h-4" />
+                )}
+                Confirm Cash Collected
+              </button>
+            )}
+
+            {/* Manual refund warning */}
+            {order.needsManualRefund && (
+              <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 font-medium flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>
+                  Auto-refund failed for this order. Please process the refund
+                  manually via the Cashfree dashboard.
+                </span>
+              </div>
+            )}
           </Section>
 
           {/* Timestamps */}

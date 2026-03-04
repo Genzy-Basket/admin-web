@@ -94,6 +94,26 @@ export const OrderProvider = ({ children }) => {
     [currentOrder],
   );
 
+  const confirmCodCollection = useCallback(
+    async (orderId, adminNotes) => {
+      try {
+        const res = await orderApi.confirmCodCollection(orderId, adminNotes);
+        const updated = res.data;
+        setOrders((prev) =>
+          prev.map((o) => (o.orderId === orderId ? updated : o)),
+        );
+        if (currentOrder?.orderId === orderId) setCurrentOrder(updated);
+        errorBus.emit("Cash collection confirmed", "success");
+        return { success: true, data: updated };
+      } catch (err) {
+        const message = err.message || "Failed to confirm cash collection";
+        errorBus.emit(message, "error");
+        return { success: false, message };
+      }
+    },
+    [currentOrder],
+  );
+
   const bulkOutForDelivery = useCallback(async () => {
     try {
       const res = await orderApi.bulkOutForDelivery();
@@ -120,6 +140,7 @@ export const OrderProvider = ({ children }) => {
         fetchStats,
         fetchOrder,
         updateStatus,
+        confirmCodCollection,
         cancelOrder,
         bulkOutForDelivery,
         setCurrentOrder,
