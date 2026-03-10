@@ -74,7 +74,7 @@ const EditProductPage = () => {
   if (loading)
     return (
       <div className="h-96 flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#009661]" size={40} />
+        <Loader2 className="animate-spin text-[#099E0E]" size={40} />
       </div>
     );
 

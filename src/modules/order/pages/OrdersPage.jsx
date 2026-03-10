@@ -91,7 +91,7 @@ const OrderCard = ({ order, onClick, mapsUrl }) => (
   >
     <div className="flex items-start justify-between gap-3 mb-3">
       <div className="min-w-0">
-        <span className="font-mono text-xs font-bold text-[#009661]">#{order.orderId}</span>
+        <span className="font-mono text-xs font-bold text-[#099E0E]">#{order.orderId}</span>
         <p className="text-sm font-semibold text-slate-800 mt-0.5 truncate">
           {order.userId?.fullName || "—"}
         </p>
@@ -132,7 +132,7 @@ const OrderCard = ({ order, onClick, mapsUrl }) => (
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#009661] text-white text-xs font-bold rounded-lg hover:bg-[#007d51] transition-all"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#099E0E] text-white text-xs font-bold rounded-lg hover:bg-[#078A0C] transition-all"
         >
           <Navigation className="w-3 h-3" />
           Directions
@@ -269,7 +269,7 @@ const OrdersPage = () => {
 
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5">
-        <StatCard label="Total Orders" value={totalOrders} sub={`${stats?.allTime?.orders ?? 0} paid`} icon={ShoppingBag} color="bg-[#009661]" />
+        <StatCard label="Total Orders" value={totalOrders} sub={`${stats?.allTime?.orders ?? 0} paid`} icon={ShoppingBag} color="bg-[#099E0E]" />
         <StatCard label="Pending" value={pendingCount} sub="Awaiting action" icon={Filter} color="bg-amber-500" />
         <StatCard label="Today's Revenue" value={`₹${todayRevenue.toLocaleString("en-IN")}`} sub={`${stats?.today?.orders ?? 0} orders`} icon={TrendingUp} color="bg-emerald-500" />
         <StatCard label="All-Time Revenue" value={`₹${allTimeRevenue.toLocaleString("en-IN")}`} sub="Paid orders only" icon={IndianRupee} color="bg-violet-500" />
@@ -279,11 +279,11 @@ const OrdersPage = () => {
       <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-            <Clock className="w-4 h-4 text-[#009661]" />
+            <Clock className="w-4 h-4 text-[#099E0E]" />
           </div>
           <div>
             <p className="text-sm font-bold text-emerald-800">Delivery Pooling Schedule</p>
-            <p className="text-xs text-[#009661] mt-0.5">
+            <p className="text-xs text-[#099E0E] mt-0.5">
               Orders before <strong>{fmt12(DELIVERY_CONFIG.orderCutoffHour, DELIVERY_CONFIG.orderCutoffMinute)}</strong>
               {" "}→ delivered by <strong>{fmt12(DELIVERY_CONFIG.deliveryByHour, DELIVERY_CONFIG.deliveryByMinute)}</strong> next morning
             </p>
@@ -299,7 +299,7 @@ const OrdersPage = () => {
           <button
             onClick={handleBulkOutForDelivery}
             disabled={bulking || dispatchableCount === 0}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#009661] text-white text-sm font-bold rounded-xl hover:bg-[#007d51] disabled:opacity-50 transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all"
           >
             {bulking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
             Mark All Out for Delivery
@@ -322,10 +322,10 @@ const OrdersPage = () => {
                 placeholder="Search by order ID…"
                 value={filters.search}
                 onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-                className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#009661]/30"
+                className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#099E0E]/30"
               />
             </div>
-            <button type="submit" className="px-4 py-2.5 bg-[#009661] text-white text-sm font-semibold rounded-xl hover:bg-[#007d51] transition-all">
+            <button type="submit" className="px-4 py-2.5 bg-[#099E0E] text-white text-sm font-semibold rounded-xl hover:bg-[#078A0C] transition-all">
               Search
             </button>
           </form>
@@ -335,7 +335,7 @@ const OrdersPage = () => {
             onClick={() => setShowDatePicker((v) => !v)}
             className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold rounded-xl border transition-all ${
               filters.startDate || filters.endDate
-                ? "bg-[#009661] text-white border-[#009661]"
+                ? "bg-[#099E0E] text-white border-[#099E0E]"
                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
             }`}
           >
@@ -366,7 +366,7 @@ const OrdersPage = () => {
                 type="date"
                 value={filters.startDate}
                 onChange={(e) => handleDateChange("startDate", e.target.value)}
-                className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#009661]/30"
+                className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#099E0E]/30"
               />
             </div>
             <div className="flex-1">
@@ -375,7 +375,7 @@ const OrdersPage = () => {
                 type="date"
                 value={filters.endDate}
                 onChange={(e) => handleDateChange("endDate", e.target.value)}
-                className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#009661]/30"
+                className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#099E0E]/30"
               />
             </div>
           </div>
@@ -386,7 +386,7 @@ const OrdersPage = () => {
           <button
             onClick={() => handleStatusFilter("")}
             className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${
-              filters.status === "" ? "bg-[#009661] text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              filters.status === "" ? "bg-[#099E0E] text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
             All
@@ -396,7 +396,7 @@ const OrdersPage = () => {
               key={s}
               onClick={() => handleStatusFilter(s)}
               className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${
-                filters.status === s ? "bg-[#009661] text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                filters.status === s ? "bg-[#099E0E] text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               {STATUS_CONFIG[s].label}
@@ -411,7 +411,7 @@ const OrdersPage = () => {
       {/* ── Order list ── */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-10 h-10 border-4 border-[#009661] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#099E0E] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : orders.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center shadow-sm">
@@ -453,7 +453,7 @@ const OrdersPage = () => {
                     className="hover:bg-slate-50 cursor-pointer transition-colors"
                   >
                     <td className="px-4 py-3">
-                      <span className="font-mono text-xs font-bold text-[#009661]">#{order.orderId}</span>
+                      <span className="font-mono text-xs font-bold text-[#099E0E]">#{order.orderId}</span>
                     </td>
                     <td className="px-4 py-3">
                       <p className="font-semibold text-slate-800">{order.userId?.fullName || "—"}</p>

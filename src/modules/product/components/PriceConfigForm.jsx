@@ -21,7 +21,7 @@ const PriceConfigForm = ({
       {/* Header Section */}
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
-          <Database size={18} className="text-[#009661]" />
+          <Database size={18} className="text-[#099E0E]" />
           <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider">
             Pricing & Variants
           </h3>
@@ -32,7 +32,7 @@ const PriceConfigForm = ({
             variant="ghost"
             size="sm"
             onClick={onAdd}
-            className="text-[#009661] hover:bg-emerald-50 font-bold"
+            className="text-[#099E0E] hover:bg-emerald-50 font-bold"
           >
             <Plus size={16} className="mr-1" /> Add Variant
           </Button>

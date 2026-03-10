@@ -35,7 +35,7 @@ const PageContainer = ({
       <div className={`${maxWidthClasses[maxWidth]} mx-auto`}>
         {title && (
           <div className="flex items-center gap-3 mb-6">
-            {Icon && <Icon size={32} className="text-[#009661]" />}
+            {Icon && <Icon size={32} className="text-[#099E0E]" />}
             <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
           </div>
         )}

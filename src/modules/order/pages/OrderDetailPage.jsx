@@ -176,7 +176,7 @@ const OrderDetailPage = () => {
   if (loading && !order) {
     return (
       <div className="flex items-center justify-center min-h-64">
-        <Loader2 className="w-8 h-8 text-[#009661] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#099E0E] animate-spin" />
       </div>
     );
   }
@@ -188,7 +188,7 @@ const OrderDetailPage = () => {
         <p className="font-bold text-slate-700">{error}</p>
         <button
           onClick={() => navigate("/orders")}
-          className="mt-5 px-6 py-2.5 bg-[#009661] text-white rounded-xl text-sm font-bold hover:bg-[#007d51] transition-all"
+          className="mt-5 px-6 py-2.5 bg-[#099E0E] text-white rounded-xl text-sm font-bold hover:bg-[#078A0C] transition-all"
         >
           Back to Orders
         </button>
@@ -211,7 +211,7 @@ const OrderDetailPage = () => {
         <div className="flex-1">
           <h1 className="text-xl font-black text-slate-900">
             Order{" "}
-            <span className="font-mono text-[#009661]">#{order.orderId}</span>
+            <span className="font-mono text-[#099E0E]">#{order.orderId}</span>
           </h1>
           <p className="text-xs text-slate-400 mt-0.5">
             Placed on{" "}
@@ -327,7 +327,7 @@ const OrderDetailPage = () => {
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-[#009661] text-white text-xs font-bold rounded-xl hover:bg-[#007d51] transition-all"
+                    className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-[#099E0E] text-white text-xs font-bold rounded-xl hover:bg-[#078A0C] transition-all"
                   >
                     <Navigation className="w-3.5 h-3.5" />
                     Get Directions
@@ -467,7 +467,7 @@ const OrderDetailPage = () => {
               <select
                 value={statusValue}
                 onChange={(e) => setStatusValue(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#009661]/30 mb-3"
+                className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#099E0E]/30 mb-3"
               >
                 {UPDATABLE_STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -480,7 +480,7 @@ const OrderDetailPage = () => {
                 placeholder="Admin notes (optional)"
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#009661]/30 mb-3"
+                className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#099E0E]/30 mb-3"
               />
               {statusError && (
                 <p className="text-xs text-red-500 font-medium mb-2 flex items-center gap-1">
@@ -495,7 +495,7 @@ const OrderDetailPage = () => {
               <button
                 onClick={handleUpdateStatus}
                 disabled={saving}
-                className="w-full py-2.5 bg-[#009661] text-white text-sm font-bold rounded-xl hover:bg-[#007d51] disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all flex items-center justify-center gap-2"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 Save Status
@@ -571,7 +571,7 @@ const OrderDetailPage = () => {
               placeholder="Internal notes for the team"
               value={cancelAdminNotes}
               onChange={(e) => setCancelAdminNotes(e.target.value)}
-              className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#009661]/30"
+              className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#099E0E]/30"
             />
           </div>
           {order.payment?.status === "success" &&

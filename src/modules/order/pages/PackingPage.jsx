@@ -41,7 +41,7 @@ const aggregateItems = (orders) => {
 const ItemRow = ({ name, qty, unit }) => (
   <div className="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0">
     <span className="text-sm font-semibold text-slate-700">{name}</span>
-    <span className="text-sm font-black text-[#009661]">
+    <span className="text-sm font-black text-[#099E0E]">
       {qty} <span className="font-medium text-slate-400 text-xs">{unit}</span>
     </span>
   </div>
@@ -55,7 +55,7 @@ const PackingOrderCard = ({ order, onClick }) => (
   >
     <div className="flex items-start justify-between gap-3 mb-3">
       <div>
-        <span className="font-mono text-xs font-bold text-[#009661]">#{order.orderId}</span>
+        <span className="font-mono text-xs font-bold text-[#099E0E]">#{order.orderId}</span>
         <p className="text-sm font-semibold text-slate-800 mt-0.5">
           {order.userId?.fullName || "—"}
         </p>
@@ -141,11 +141,11 @@ const PackingPage = () => {
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-              <Package className="w-4 h-4 text-[#009661]" />
+              <Package className="w-4 h-4 text-[#099E0E]" />
             </div>
             <div>
               <p className="text-sm font-bold text-emerald-800">Today's Packing Window</p>
-              <p className="text-xs text-[#009661] mt-0.5">
+              <p className="text-xs text-[#099E0E] mt-0.5">
                 Orders placed <strong>today up to 11:00 PM</strong> · {packingOrders.length} orders
               </p>
             </div>
@@ -181,7 +181,7 @@ const PackingPage = () => {
           <button
             onClick={handleBulkDelivered}
             disabled={bulkingDelivered || notYetDelivered.length === 0}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#009661] text-white text-sm font-bold rounded-xl hover:bg-[#007d51] disabled:opacity-50 transition-all"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all"
           >
             {bulkingDelivered
               ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -199,7 +199,7 @@ const PackingPage = () => {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-10 h-10 border-4 border-[#009661] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#099E0E] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : packingOrders.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center shadow-sm">

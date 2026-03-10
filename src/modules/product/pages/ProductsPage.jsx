@@ -91,7 +91,7 @@ const ProductsPage = () => {
           <input
             type="text"
             placeholder="Search products..."
-            className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none"
+            className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -103,7 +103,7 @@ const ProductsPage = () => {
             onClick={() => setFilterOpen((v) => !v)}
             className={`h-full px-3 rounded-xl border transition-colors flex items-center gap-1.5 ${
               activeFilterCount > 0
-                ? "bg-[#009661] border-[#009661] text-white"
+                ? "bg-[#099E0E] border-[#099E0E] text-white"
                 : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -121,7 +121,7 @@ const ProductsPage = () => {
                 {activeFilterCount > 0 && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs text-[#009661] hover:underline flex items-center gap-1"
+                    className="text-xs text-[#099E0E] hover:underline flex items-center gap-1"
                   >
                     <X size={12} /> Clear all
                   </button>
@@ -174,7 +174,7 @@ const ProductsPage = () => {
                         }
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
                           categoryFilter === cat
-                            ? "bg-[#009661] border-[#009661] text-white"
+                            ? "bg-[#099E0E] border-[#099E0E] text-white"
                             : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                         }`}
                       >

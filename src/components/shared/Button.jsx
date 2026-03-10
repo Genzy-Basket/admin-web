@@ -11,13 +11,13 @@ const Button = ({
   className = "",
 }) => {
   const variantClasses = {
-    primary:   "bg-[#009661] text-white hover:bg-[#007d51] shadow-md hover:shadow-lg shadow-[#009661]/20",
-    secondary: "bg-white text-[#009661] border-2 border-[#009661]/40 hover:bg-emerald-50",
+    primary:   "bg-[#099E0E] text-white hover:bg-[#078A0C] shadow-md hover:shadow-lg shadow-[#099E0E]/20",
+    secondary: "bg-white text-[#099E0E] border-2 border-[#099E0E]/40 hover:bg-emerald-50",
     danger:    "bg-white text-rose-600 border border-rose-300 hover:bg-rose-50",
     warning:   "bg-white text-amber-600 border border-amber-300 hover:bg-amber-50",
     success:   "bg-emerald-500 text-white hover:bg-emerald-600 shadow-md",
     dark:      "bg-slate-900 text-white hover:bg-slate-800 shadow-xl",
-    dashed:    "border-2 border-dashed border-[#009661]/40 text-[#009661] hover:bg-emerald-50 bg-white",
+    dashed:    "border-2 border-dashed border-[#099E0E]/40 text-[#099E0E] hover:bg-emerald-50 bg-white",
     ghost:     "text-slate-400 hover:text-rose-500",
   };
 

@@ -52,7 +52,7 @@ const MediaPicker = ({ imagePreview, imageFile, onFileSelect, onRemove }) => {
           </div>
         </div>
       ) : (
-        <div className="p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-center cursor-pointer hover:border-[#009661] transition-colors">
+        <div className="p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-center cursor-pointer hover:border-[#099E0E] transition-colors">
           <input
             ref={fileInputRef}
             type="file"

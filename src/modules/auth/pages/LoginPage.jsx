@@ -34,22 +34,26 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#009661] rounded-2xl mb-4 shadow-lg shadow-[#009661]/30">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#099E0E] rounded-2xl mb-4 shadow-lg shadow-[#099E0E]/30">
             <Leaf className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-            FreshMart<span className="text-[#009661]">.</span>
+            Genzy Basket<span className="text-[#099E0E]">.</span>
           </h1>
-          <p className="text-slate-500 mt-1 text-sm font-medium">Admin Dashboard</p>
+          <p className="text-slate-500 mt-1 text-sm font-medium">
+            Admin Dashboard
+          </p>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
-          <h2 className="text-xl font-black text-slate-800 mb-6">Sign in to your account</h2>
+          <h2 className="text-xl font-black text-slate-800 mb-6">
+            Sign in to your account
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
@@ -63,10 +67,10 @@ const LoginPage = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="admin@freshmart.com"
+                placeholder="admin@genzybasket.com"
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none transition-all text-sm"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none transition-all text-sm"
               />
             </div>
 
@@ -85,7 +89,7 @@ const LoginPage = () => {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  className="w-full px-4 py-3 pr-11 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none transition-all text-sm"
+                  className="w-full px-4 py-3 pr-11 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none transition-all text-sm"
                 />
                 <button
                   type="button"
@@ -109,13 +113,28 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-[#009661] text-white font-bold rounded-xl hover:bg-[#007d51] transition-all shadow-md shadow-[#009661]/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3 bg-[#099E0E] text-white font-bold rounded-xl hover:bg-[#078A0C] transition-all shadow-md shadow-[#099E0E]/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
             >
               {isLoading ? (
                 <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="w-4 h-4 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Signing in…
                 </>
@@ -127,7 +146,7 @@ const LoginPage = () => {
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-6">
-          FreshMart Admin · Authorized Access Only
+          Genzy Basket Admin · Authorized Access Only
         </p>
       </div>
     </div>

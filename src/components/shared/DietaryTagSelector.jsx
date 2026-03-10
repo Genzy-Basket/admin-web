@@ -79,13 +79,13 @@ const DietaryTagsSelector = ({ selectedTags, onChange }) => {
           {selectedTags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#009661] text-white text-xs font-bold rounded-full shadow-sm"
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#099E0E] text-white text-xs font-bold rounded-full shadow-sm"
             >
               {tag}
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="hover:bg-[#007d51] rounded-full p-0.5 transition-colors"
+                className="hover:bg-[#078A0C] rounded-full p-0.5 transition-colors"
               >
                 <X size={12} />
               </button>
@@ -115,7 +115,7 @@ const DietaryTagsSelector = ({ selectedTags, onChange }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tags..."
-              className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#009661]/30 focus:border-transparent"
+              className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#099E0E]/30 focus:border-transparent"
             />
 
             {/* Tags Grid */}
@@ -130,8 +130,8 @@ const DietaryTagsSelector = ({ selectedTags, onChange }) => {
                       onClick={() => toggleTag(tag)}
                       className={`px-3 py-2 text-xs font-semibold rounded-lg border-2 transition-all capitalize ${
                         isSelected
-                          ? "bg-[#009661] text-white border-[#009661] shadow-sm"
-                          : "bg-white text-gray-700 border-gray-200 hover:border-[#009661]/30 hover:bg-emerald-50"
+                          ? "bg-[#099E0E] text-white border-[#099E0E] shadow-sm"
+                          : "bg-white text-gray-700 border-gray-200 hover:border-[#099E0E]/30 hover:bg-emerald-50"
                       }`}
                     >
                       {tag}

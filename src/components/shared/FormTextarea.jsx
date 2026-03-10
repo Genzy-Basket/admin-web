@@ -26,7 +26,7 @@ const FormTextarea = ({
         placeholder={placeholder}
         required={required}
         rows={rows}
-        className={`w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none resize-none transition-all text-sm ${
+        className={`w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none resize-none transition-all text-sm ${
           monospace ? "font-mono" : ""
         }`}
       />

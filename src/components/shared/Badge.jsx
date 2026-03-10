@@ -9,13 +9,13 @@ const Badge = ({
   className = "",
 }) => {
   const variantClasses = {
-    primary:   "bg-[#009661] text-white",
+    primary:   "bg-[#099E0E] text-white",
     secondary: "bg-slate-100 text-slate-700",
     success:   "bg-emerald-500 text-white",
     warning:   "bg-amber-500 text-white",
     danger:    "bg-rose-500 text-white",
     info:      "bg-sky-500 text-white",
-    outline:   "bg-white border-2 border-[#009661] text-[#009661]",
+    outline:   "bg-white border-2 border-[#099E0E] text-[#099E0E]",
   };
 
   const sizeClasses = {

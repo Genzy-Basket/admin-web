@@ -25,7 +25,7 @@ const FormSelect = ({
           value={value}
           onChange={onChange}
           required={required}
-          className={`w-full px-4 ${vPadding} border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none bg-white transition-all appearance-none cursor-pointer text-sm ${
+          className={`w-full px-4 ${vPadding} border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none bg-white transition-all appearance-none cursor-pointer text-sm ${
             capitalize ? "capitalize" : ""
           }`}
         >

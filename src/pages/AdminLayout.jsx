@@ -39,7 +39,7 @@ const FAB = () => {
   return (
     <button
       onClick={fab.onClick}
-      className={`fixed bottom-6 right-6 z-40 lg:hidden flex items-center gap-2 px-4 py-3.5 bg-[#009661] text-white rounded-2xl shadow-lg shadow-[#009661]/30 font-bold text-sm transition-all duration-300 ${
+      className={`fixed bottom-6 right-6 z-40 lg:hidden flex items-center gap-2 px-4 py-3.5 bg-[#099E0E] text-white rounded-2xl shadow-lg shadow-[#099E0E]/30 font-bold text-sm transition-all duration-300 ${
         visible
           ? "translate-y-0 opacity-100"
           : "translate-y-24 opacity-0 pointer-events-none"

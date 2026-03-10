@@ -62,7 +62,7 @@ const TimePicker = ({ label, hour, minute, onChange, hint }) => (
         const { hour: h, minute: m } = fromTimeValue(e.target.value);
         onChange(h, m);
       }}
-      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none transition-all"
+      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none transition-all"
       required
     />
     {hint && <p className="text-xs text-slate-400 mt-1">{hint}</p>}
@@ -194,7 +194,7 @@ const DashboardPage = () => {
   return (
     <PageContainer>
       <div className="hidden sm:flex items-center gap-3 mb-8">
-        <LayoutDashboard className="w-7 h-7 text-[#009661]" />
+        <LayoutDashboard className="w-7 h-7 text-[#099E0E]" />
         <h1 className="text-3xl font-black text-slate-800">Dashboard</h1>
       </div>
 
@@ -225,7 +225,7 @@ const DashboardPage = () => {
                     step="1"
                     value={deliveryCharge}
                     onChange={(e) => setDeliveryCharge(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none"
                     required
                   />
                   <p className="text-xs text-slate-400 mt-1">
@@ -242,7 +242,7 @@ const DashboardPage = () => {
                     step="1"
                     value={freeThreshold}
                     onChange={(e) => setFreeThreshold(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#009661]/30 focus:border-[#009661] outline-none"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#099E0E]/30 focus:border-[#099E0E] outline-none"
                     required
                   />
                   <p className="text-xs text-slate-400 mt-1">
@@ -259,7 +259,7 @@ const DashboardPage = () => {
                 <button
                   type="submit"
                   disabled={feeStatus === "loading"}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-[#009661] text-white text-sm font-bold rounded-xl hover:bg-[#007d51] disabled:opacity-50 transition-all shrink-0"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all shrink-0"
                 >
                   {feeStatus === "loading" ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -321,7 +321,7 @@ const DashboardPage = () => {
                 <button
                   type="submit"
                   disabled={scheduleStatus === "loading"}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-[#009661] text-white text-sm font-bold rounded-xl hover:bg-[#007d51] disabled:opacity-50 transition-all shrink-0"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all shrink-0"
                 >
                   {scheduleStatus === "loading" ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -353,7 +353,7 @@ const DashboardPage = () => {
             <button
               onClick={handleBustCache}
               disabled={cacheStatus === "loading"}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#009661] text-white text-sm font-bold rounded-xl hover:bg-[#007d51] disabled:opacity-50 transition-all shrink-0"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all shrink-0"
             >
               {cacheStatus === "loading" ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

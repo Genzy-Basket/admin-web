@@ -24,7 +24,7 @@ export const Header = ({ setIsSidebarOpen }) => {
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className="p-2 rounded-xl bg-slate-50 text-slate-600 lg:hidden hover:bg-emerald-50 hover:text-[#009661] transition-colors border border-slate-200/50 shrink-0"
+          className="p-2 rounded-xl bg-slate-50 text-slate-600 lg:hidden hover:bg-emerald-50 hover:text-[#099E0E] transition-colors border border-slate-200/50 shrink-0"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -41,7 +41,7 @@ export const Header = ({ setIsSidebarOpen }) => {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="group flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-[#009661] hover:bg-[#009661] hover:text-white transition-all duration-300 border border-emerald-200 active:scale-95 disabled:opacity-50"
+            className="group flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-[#099E0E] hover:bg-[#099E0E] hover:text-white transition-all duration-300 border border-emerald-200 active:scale-95 disabled:opacity-50"
           >
             <RefreshCw
               className={`w-4 h-4 ${

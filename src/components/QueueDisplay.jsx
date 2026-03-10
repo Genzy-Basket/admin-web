@@ -42,7 +42,7 @@ const QueueDisplay = ({
     processing: {
       bg: "bg-emerald-50",
       border: "border-emerald-200",
-      text: "text-[#009661]",
+      text: "text-[#099E0E]",
     },
     completed: {
       bg: "bg-emerald-50",
@@ -74,7 +74,7 @@ const QueueDisplay = ({
                     </span>
                   )}
                   {queueStats.processing > 0 && (
-                    <span className="text-[#009661]">
+                    <span className="text-[#099E0E]">
                       ⚡ {queueStats.processing}
                     </span>
                   )}

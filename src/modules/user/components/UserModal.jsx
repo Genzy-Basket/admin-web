@@ -41,7 +41,7 @@ const UserModal = ({ user, isOpen, onClose }) => {
       {/* Custom header inside body for avatar layout */}
       <div className="flex items-start justify-between gap-4 mb-5 pb-5 border-b border-slate-100">
         <div className="flex gap-3 items-center min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 ring-1 ring-emerald-100 flex items-center justify-center text-[#009661] shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 ring-1 ring-emerald-100 flex items-center justify-center text-[#099E0E] shrink-0">
             <span className="text-xl font-black">{user.fullName.charAt(0)}</span>
           </div>
           <div className="min-w-0">
@@ -98,7 +98,7 @@ const UserModal = ({ user, isOpen, onClose }) => {
 
       {/* Address */}
       <div className="flex gap-3 items-start p-3 bg-slate-50 rounded-xl border border-slate-100 mb-5">
-        <div className="p-1.5 bg-emerald-50 text-[#009661] rounded-lg shrink-0">
+        <div className="p-1.5 bg-emerald-50 text-[#099E0E] rounded-lg shrink-0">
           <MapPin size={16} />
         </div>
         <div className="min-w-0">
