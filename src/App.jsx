@@ -21,6 +21,7 @@ import OrdersPage from "./modules/order/pages/OrdersPage";
 import OrderDetailPage from "./modules/order/pages/OrderDetailPage";
 import PackingPage from "./modules/order/pages/PackingPage";
 import DashboardPage from "./modules/dashboard/pages/DashboardPage";
+import NotificationsPage from "./modules/notification/pages/NotificationsPage";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/orders/:orderId" element={<OrderDetailPage />} />
               <Route path="/packing" element={<PackingPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>

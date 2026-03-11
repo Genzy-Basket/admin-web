@@ -79,8 +79,10 @@ const DashboardPage = () => {
   const [feeStatus, setFeeStatus] = useState(null);
   const [feeMsg, setFeeMsg] = useState("");
 
-  const [cutoffHour, setCutoffHour] = useState(23);
-  const [cutoffMinute, setCutoffMinute] = useState(0);
+  const [openHour, setOpenHour] = useState(8);
+  const [openMinute, setOpenMinute] = useState(0);
+  const [closeHour, setCloseHour] = useState(23);
+  const [closeMinute, setCloseMinute] = useState(0);
   const [deliveryHour, setDeliveryHour] = useState(7);
   const [deliveryMinute, setDeliveryMinute] = useState(30);
   const [scheduleStatus, setScheduleStatus] = useState(null);
@@ -91,8 +93,10 @@ const DashboardPage = () => {
   const applySettings = useCallback((d) => {
     setDeliveryCharge(d.deliveryCharge ?? 40);
     setFreeThreshold(d.freeDeliveryThreshold ?? 500);
-    setCutoffHour(d.orderCutoffHour ?? 23);
-    setCutoffMinute(d.orderCutoffMinute ?? 0);
+    setOpenHour(d.orderOpenHour ?? 8);
+    setOpenMinute(d.orderOpenMinute ?? 0);
+    setCloseHour(d.orderCloseHour ?? 23);
+    setCloseMinute(d.orderCloseMinute ?? 0);
     setDeliveryHour(d.deliveryByHour ?? 7);
     setDeliveryMinute(d.deliveryByMinute ?? 30);
   }, []);
@@ -173,14 +177,18 @@ const DashboardPage = () => {
     setScheduleMsg("");
     try {
       const res = await settingsApi.update({
-        orderCutoffHour: cutoffHour,
-        orderCutoffMinute: cutoffMinute,
+        orderOpenHour: openHour,
+        orderOpenMinute: openMinute,
+        orderCloseHour: closeHour,
+        orderCloseMinute: closeMinute,
         deliveryByHour: deliveryHour,
         deliveryByMinute: deliveryMinute,
       });
       _cache = { ..._cache, ...res.data };
-      setCutoffHour(res.data.orderCutoffHour);
-      setCutoffMinute(res.data.orderCutoffMinute);
+      setOpenHour(res.data.orderOpenHour);
+      setOpenMinute(res.data.orderOpenMinute);
+      setCloseHour(res.data.orderCloseHour);
+      setCloseMinute(res.data.orderCloseMinute);
       setDeliveryHour(res.data.deliveryByHour);
       setDeliveryMinute(res.data.deliveryByMinute);
       setScheduleStatus("success");
@@ -289,30 +297,41 @@ const DashboardPage = () => {
             </div>
           ) : (
             <form onSubmit={handleSaveSchedule}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
                 <TimePicker
-                  label="Order Cutoff Time"
-                  hour={cutoffHour}
-                  minute={cutoffMinute}
-                  onChange={(h, m) => { setCutoffHour(h); setCutoffMinute(m); }}
-                  hint="Orders placed before this time qualify for next-morning delivery."
+                  label="Order Open Time"
+                  hour={openHour}
+                  minute={openMinute}
+                  onChange={(h, m) => { setOpenHour(h); setOpenMinute(m); }}
+                  hint="Checkout opens at this time."
+                />
+                <TimePicker
+                  label="Order Close Time"
+                  hour={closeHour}
+                  minute={closeMinute}
+                  onChange={(h, m) => { setCloseHour(h); setCloseMinute(m); }}
+                  hint="Checkout closes at this time."
                 />
                 <TimePicker
                   label="Delivery By Time"
                   hour={deliveryHour}
                   minute={deliveryMinute}
                   onChange={(h, m) => { setDeliveryHour(h); setDeliveryMinute(m); }}
-                  hint="The expected delivery time the following morning."
+                  hint="Expected delivery time next morning."
                 />
               </div>
 
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <p className="text-xs text-slate-400">
-                  Preview: orders before{" "}
+                  Preview: ordering open{" "}
                   <span className="font-semibold text-slate-600">
-                    {to12h(cutoffHour, cutoffMinute)}
-                  </span>{" "}
-                  → delivered by{" "}
+                    {to12h(openHour, openMinute)}
+                  </span>
+                  {" – "}
+                  <span className="font-semibold text-slate-600">
+                    {to12h(closeHour, closeMinute)}
+                  </span>
+                  {" → delivered by "}
                   <span className="font-semibold text-slate-600">
                     {to12h(deliveryHour, deliveryMinute)}
                   </span>{" "}
