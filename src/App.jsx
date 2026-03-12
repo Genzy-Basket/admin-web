@@ -10,6 +10,7 @@ import { AuthProvider } from "./modules/auth/context/AuthContext";
 import { UserProvider } from "./modules/user/context/UserContext";
 import { ProductProvider } from "./modules/product/context/ProductContext";
 import { OrderProvider } from "./modules/order/context/OrderContext";
+import { SubscriptionProvider } from "./modules/subscription/context/SubscriptionContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./pages/AdminLayout";
 import LoginPage from "./modules/auth/pages/LoginPage";
@@ -22,6 +23,8 @@ import OrderDetailPage from "./modules/order/pages/OrderDetailPage";
 import PackingPage from "./modules/order/pages/PackingPage";
 import DashboardPage from "./modules/dashboard/pages/DashboardPage";
 import NotificationsPage from "./modules/notification/pages/NotificationsPage";
+import SubscriptionsPage from "./modules/subscription/pages/SubscriptionsPage";
+import SubscriptionDetailPage from "./modules/subscription/pages/SubscriptionDetailPage";
 
 function App() {
   return (
@@ -36,7 +39,9 @@ function App() {
                   <UserProvider>
                     <ProductProvider>
                       <OrderProvider>
-                        <AdminLayout />
+                        <SubscriptionProvider>
+                          <AdminLayout />
+                        </SubscriptionProvider>
                       </OrderProvider>
                     </ProductProvider>
                   </UserProvider>
@@ -55,6 +60,8 @@ function App() {
               <Route path="/orders/:orderId" element={<OrderDetailPage />} />
               <Route path="/packing" element={<PackingPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/subscriptions" element={<SubscriptionsPage />} />
+              <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetailPage />} />
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>
