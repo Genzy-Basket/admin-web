@@ -128,8 +128,17 @@ const SubscriptionProductsConfig = () => {
     setPickerSearch("");
   };
 
+  const [confirmRemove, setConfirmRemove] = useState(null);
+
   const handleRemove = (productId) => {
-    setSelectedIds((prev) => prev.filter((id) => id !== productId));
+    setConfirmRemove(productId);
+  };
+
+  const confirmRemoveProduct = () => {
+    if (confirmRemove) {
+      setSelectedIds((prev) => prev.filter((id) => id !== confirmRemove));
+      setConfirmRemove(null);
+    }
   };
 
   const handleSave = async () => {
@@ -241,6 +250,32 @@ const SubscriptionProductsConfig = () => {
         >
           + Add product
         </button>
+      )}
+
+      {/* Remove confirmation modal */}
+      {confirmRemove && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setConfirmRemove(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-bold text-slate-800 text-lg">Remove Product?</h3>
+            <p className="text-slate-500 text-sm mt-1 mb-5">
+              Are you sure you want to remove <strong>{selectedProducts.find((p) => p._id === confirmRemove)?.name}</strong> from subscription products?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmRemove(null)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm hover:bg-slate-200 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRemoveProduct}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-semibold text-sm hover:bg-red-600 transition-all"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

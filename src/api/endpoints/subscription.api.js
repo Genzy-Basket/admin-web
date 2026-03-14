@@ -19,6 +19,15 @@ export const subscriptionApi = {
     return res.data;
   },
 
+  /** Mark a specific delivery date as packed */
+  markPacked: async (subscriptionId, date) => {
+    const res = await axiosClient.post(
+      `/admin/subscriptions/${subscriptionId}/pack`,
+      { date },
+    );
+    return res.data;
+  },
+
   /** Mark a specific delivery date as delivered */
   markDelivered: async (subscriptionId, date) => {
     const res = await axiosClient.post(
@@ -28,9 +37,9 @@ export const subscriptionApi = {
     return res.data;
   },
 
-  /** Bulk mark today's deliveries as delivered */
-  bulkMarkDelivered: async () => {
-    const res = await axiosClient.post("/admin/subscriptions/bulk-deliver");
+  /** Bulk mark a date's deliveries as delivered */
+  bulkMarkDelivered: async (date) => {
+    const res = await axiosClient.post("/admin/subscriptions/bulk-deliver", { date });
     return res.data;
   },
 

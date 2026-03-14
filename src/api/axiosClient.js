@@ -1,7 +1,7 @@
 import axios from "axios";
 import { errorBus } from "./errorBus";
 
-const PUBLIC_ENDPOINTS = ["/auth/admin/login", "/auth/register", "/auth/login"];
+const PUBLIC_ENDPOINTS = ["/auth/admin/send-otp", "/auth/admin/verify-otp", "/auth/register", "/auth/login"];
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -36,7 +36,7 @@ axiosClient.interceptors.response.use(
       message = data?.message || message;
 
       if (status === 401) {
-        const isLoginPage = window.location.pathname.includes("/login");
+        const isLoginPage = window.location.hash.includes("/login");
         if (!isLoginPage) {
           // Let ToastProvider's auth:logout listener handle the redirect + cleanup
           window.dispatchEvent(new Event("auth:logout"));

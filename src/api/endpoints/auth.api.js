@@ -2,9 +2,12 @@
 import axiosClient from "../axiosClient";
 
 export const authApi = {
-  login: async (credentials) => {
-    // credentials = { email, password }
-    const response = await axiosClient.post("/auth/admin/login", credentials);
+  sendOtp: async (email, password) => {
+    const response = await axiosClient.post("/auth/admin/send-otp", { email, password });
+    return response.data;
+  },
+  verifyOtp: async (email, otp) => {
+    const response = await axiosClient.post("/auth/admin/verify-otp", { email, otp });
     return response.data;
   },
 };

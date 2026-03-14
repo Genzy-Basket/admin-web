@@ -29,9 +29,15 @@ const STATUS_CONFIG = {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const todayDateStr = () => {
+const dateStr = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+const todayDateStr = () => dateStr(new Date());
+
+const tomorrowDateStr = () => {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  d.setDate(d.getDate() + 1);
+  return dateStr(d);
 };
 
 const aggregateItems = (orders) => {
@@ -148,13 +154,12 @@ const OrderCard = ({ order, onClick, actionLabel, actionIcon: ActionIcon, onActi
   </div>
 );
 
-// ── Subscription delivery card ───────────────────────────────────────────────
-const SubDeliveryCard = ({ sub, onDeliver, delivering }) => (
+// ── Subscription card (minimal) ─────────────────────────────────────────────
+const SubCard = ({ sub, actionLabel, actionIcon: ActionIcon, onAction, acting }) => (
   <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-    <div className="flex items-start justify-between gap-3 mb-3">
+    <div className="flex items-start justify-between gap-3 mb-2">
       <div>
-        <span className="font-mono text-xs font-bold text-purple-600">#{sub.subscriptionId}</span>
-        <p className="text-sm font-semibold text-slate-800 mt-0.5">
+        <p className="text-sm font-semibold text-slate-800">
           {sub.userId?.fullName || "—"}
         </p>
         {sub.userId?.phoneNumber && (
@@ -176,21 +181,19 @@ const SubDeliveryCard = ({ sub, onDeliver, delivering }) => (
       ))}
     </div>
 
-    <div className="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center">
-      <span className="text-xs text-slate-400">₹{sub.dailyCost?.toLocaleString("en-IN")}/day</span>
-    </div>
-
-    <button
-      onClick={onDeliver}
-      disabled={delivering}
-      className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50 transition-all"
-    >
-      {delivering
-        ? <Loader2 className="w-4 h-4 animate-spin" />
-        : <CheckCircle2 className="w-4 h-4" />
-      }
-      Mark Delivered
-    </button>
+    {onAction && (
+      <button
+        onClick={onAction}
+        disabled={acting}
+        className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50 transition-all"
+      >
+        {acting
+          ? <Loader2 className="w-4 h-4 animate-spin" />
+          : ActionIcon && <ActionIcon className="w-4 h-4" />
+        }
+        {actionLabel}
+      </button>
+    )}
   </div>
 );
 
@@ -216,8 +219,10 @@ const PackingPage = () => {
   const [subs, setSubs] = useState([]);
   const [subsLoading, setSubsLoading] = useState(false);
   const [deliveringSubId, setDeliveringSubId] = useState(null);
+  const [packingSubId, setPackingSubId] = useState(null);
 
   const today = todayDateStr();
+  const tomorrow = tomorrowDateStr();
 
   const load = useCallback(() => {
     fetchOrders({ startDate: today });
@@ -227,20 +232,20 @@ const PackingPage = () => {
     setSubsLoading(true);
     try {
       const res = await subscriptionApi.getAll({ status: "active", limit: 200 });
-      const all = res.data || [];
-      // Filter to subscriptions that have today as an upcoming delivery date
-      const todayPending = all.filter((s) =>
+      const all = res.subscriptions || [];
+      // Filter to subscriptions that have tomorrow as an upcoming or packed delivery
+      const tomorrowSubs = all.filter((s) =>
         s.deliveryDates?.some(
-          (dd) => dd.status === "upcoming" && dd.date?.slice(0, 10) === today,
+          (dd) => ["upcoming", "packed"].includes(dd.status) && dd.date?.slice(0, 10) === tomorrow,
         ),
       );
-      setSubs(todayPending);
+      setSubs(tomorrowSubs);
     } catch {
       setSubs([]);
     } finally {
       setSubsLoading(false);
     }
-  }, [today]);
+  }, [tomorrow]);
 
   useEffect(() => { load(); loadSubs(); }, [load, loadSubs]);
 
@@ -255,12 +260,18 @@ const PackingPage = () => {
   );
   const packedOrders = orders.filter((o) => o.orderStatus === "packed");
 
+  // ── Split subscriptions by tomorrow's delivery date status ──
+  const getSubDateStatus = (s) =>
+    s.deliveryDates?.find((dd) => dd.date?.slice(0, 10) === tomorrow)?.status;
+  const unpackedSubs = subs.filter((s) => getSubDateStatus(s) === "upcoming");
+  const packedSubs = subs.filter((s) => getSubDateStatus(s) === "packed");
+
   // ── Aggregated items for current tab ──
   const packingList = tab === "to_pack"
     ? aggregateItems(toPackOrders)
     : tab === "packed"
       ? aggregateItems(packedOrders)
-      : aggregateSubItems(subs);
+      : aggregateSubItems(unpackedSubs);
   const totalItems = packingList.reduce((s, i) => s + i.qty, 0);
 
   // ── Actions ──
@@ -291,10 +302,22 @@ const PackingPage = () => {
     setBulking(null);
   };
 
+  const handleSubPack = async (subId) => {
+    setPackingSubId(subId);
+    try {
+      await subscriptionApi.markPacked(subId, tomorrow);
+      errorBus.emit("Subscription marked as packed", "success");
+      loadSubs();
+    } catch (err) {
+      errorBus.emit(err.message || "Failed to mark packed", "error");
+    }
+    setPackingSubId(null);
+  };
+
   const handleSubDeliver = async (subId) => {
     setDeliveringSubId(subId);
     try {
-      await subscriptionApi.markDelivered(subId, today);
+      await subscriptionApi.markDelivered(subId, tomorrow);
       errorBus.emit("Subscription delivery marked", "success");
       loadSubs();
     } catch (err) {
@@ -304,10 +327,10 @@ const PackingPage = () => {
   };
 
   const handleBulkSubDeliver = async () => {
-    if (!subs.length) return;
+    if (!packedSubs.length) return;
     setBulking("sub_deliver");
     try {
-      const res = await subscriptionApi.bulkMarkDelivered();
+      const res = await subscriptionApi.bulkMarkDelivered(tomorrow);
       errorBus.emit(res.message || "All subscriptions delivered", "success");
       loadSubs();
     } catch (err) {
@@ -326,9 +349,9 @@ const PackingPage = () => {
       <div className="flex bg-white rounded-2xl border border-slate-200 p-1 mb-5 shadow-sm">
         {TABS.map(({ key, label, icon: Icon }) => {
           const count =
-            key === "subscriptions" ? subs.length :
+            key === "subscriptions" ? unpackedSubs.length :
             key === "to_pack" ? toPackOrders.length :
-            packedOrders.length;
+            packedOrders.length + packedSubs.length;
           return (
             <button
               key={key}
@@ -385,7 +408,7 @@ const PackingPage = () => {
         </div>
       )}
 
-      {tab === "packed" && packedOrders.length > 0 && (
+      {tab === "packed" && (packedOrders.length > 0 || packedSubs.length > 0) && (
         <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-5">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-3">
@@ -393,46 +416,65 @@ const PackingPage = () => {
                 <PackageCheck className="w-4 h-4 text-amber-600" />
               </div>
               <div>
-                <p className="text-sm font-bold text-amber-800">{packedOrders.length} packed, ready to dispatch</p>
+                <p className="text-sm font-bold text-amber-800">
+                  {packedOrders.length + packedSubs.length} packed, ready to dispatch
+                </p>
               </div>
             </div>
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={handleBulkOutForDelivery}
-              disabled={bulking === "ofd"}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 disabled:opacity-50 transition-all"
-            >
-              {bulking === "ofd"
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <Truck className="w-4 h-4" />
-              }
-              Out for Delivery
-            </button>
-            <button
-              onClick={handleBulkDelivered}
-              disabled={bulking === "delivered"}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all"
-            >
-              {bulking === "delivered"
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <CheckCircle2 className="w-4 h-4" />
-              }
-              Mark Delivered
-            </button>
+            {packedOrders.length > 0 && (
+              <>
+                <button
+                  onClick={handleBulkOutForDelivery}
+                  disabled={bulking === "ofd"}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 disabled:opacity-50 transition-all"
+                >
+                  {bulking === "ofd"
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : <Truck className="w-4 h-4" />
+                  }
+                  Out for Delivery
+                </button>
+                <button
+                  onClick={handleBulkDelivered}
+                  disabled={bulking === "delivered"}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#099E0E] text-white text-sm font-bold rounded-xl hover:bg-[#078A0C] disabled:opacity-50 transition-all"
+                >
+                  {bulking === "delivered"
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : <CheckCircle2 className="w-4 h-4" />
+                  }
+                  Mark Delivered
+                </button>
+              </>
+            )}
+            {packedSubs.length > 0 && (
+              <button
+                onClick={handleBulkSubDeliver}
+                disabled={bulking === "sub_deliver"}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50 transition-all"
+              >
+                {bulking === "sub_deliver"
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <CheckCircle2 className="w-4 h-4" />
+                }
+                Deliver Subscriptions
+              </button>
+            )}
           </div>
         </div>
       )}
 
-      {tab === "subscriptions" && subs.length > 0 && (
+      {tab === "subscriptions" && unpackedSubs.length > 0 && (
         <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4 mb-5">
-          <div className="flex items-center justify-between gap-3 mb-3">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
                 <Repeat className="w-4 h-4 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm font-bold text-purple-800">{subs.length} subscription deliveries today</p>
+                <p className="text-sm font-bold text-purple-800">{unpackedSubs.length} subscriptions to pack</p>
                 <p className="text-xs text-purple-600 mt-0.5">{totalItems} total items</p>
               </div>
             </div>
@@ -440,17 +482,6 @@ const PackingPage = () => {
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
-          <button
-            onClick={handleBulkSubDeliver}
-            disabled={bulking === "sub_deliver"}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50 transition-all"
-          >
-            {bulking === "sub_deliver"
-              ? <Loader2 className="w-4 h-4 animate-spin" />
-              : <CheckCircle2 className="w-4 h-4" />
-            }
-            Deliver All Subscriptions
-          </button>
         </div>
       )}
 
@@ -463,35 +494,20 @@ const PackingPage = () => {
         <>
           {/* ── Subscriptions tab ── */}
           {tab === "subscriptions" && (
-            subs.length === 0 ? (
-              <Empty icon={Repeat} title="No subscription deliveries today" subtitle="Active subscriptions with today's delivery will appear here" />
+            unpackedSubs.length === 0 ? (
+              <Empty icon={Repeat} title="No subscription deliveries tomorrow" subtitle="Active subscriptions with tomorrow's delivery will appear here" />
             ) : (
-              <div className="grid lg:grid-cols-2 gap-5">
-                <div>
-                  <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">
-                    Packing List — {totalItems} items
-                  </h2>
-                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
-                    {packingList.map((item) => (
-                      <ItemRow key={`${item.name}__${item.unit}`} {...item} />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">
-                    Deliveries
-                  </h2>
-                  <div className="space-y-3">
-                    {subs.map((sub) => (
-                      <SubDeliveryCard
-                        key={sub._id}
-                        sub={sub}
-                        onDeliver={() => handleSubDeliver(sub.subscriptionId)}
-                        delivering={deliveringSubId === sub.subscriptionId}
-                      />
-                    ))}
-                  </div>
-                </div>
+              <div className="space-y-3">
+                {unpackedSubs.map((sub) => (
+                  <SubCard
+                    key={sub._id}
+                    sub={sub}
+                    actionLabel="Mark Packed"
+                    actionIcon={PackageCheck}
+                    onAction={() => handleSubPack(sub.subscriptionId)}
+                    acting={packingSubId === sub.subscriptionId}
+                  />
+                ))}
               </div>
             )
           )}
@@ -536,22 +552,45 @@ const PackingPage = () => {
 
           {/* ── Packed tab ── */}
           {tab === "packed" && (
-            packedOrders.length === 0 ? (
-              <Empty icon={PackageCheck} title="No packed orders" subtitle="Orders will appear here after packing" />
+            packedOrders.length === 0 && packedSubs.length === 0 ? (
+              <Empty icon={PackageCheck} title="No packed items" subtitle="Orders and subscriptions will appear here after packing" />
             ) : (
-              <div>
-                <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">
-                  Ready to Dispatch — {packedOrders.length} orders
-                </h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {packedOrders.map((order) => (
-                    <OrderCard
-                      key={order._id}
-                      order={order}
-                      onClick={() => navigate(`/orders/${order.orderId}`)}
-                    />
-                  ))}
-                </div>
+              <div className="space-y-6">
+                {packedOrders.length > 0 && (
+                  <div>
+                    <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">
+                      Orders — {packedOrders.length}
+                    </h2>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {packedOrders.map((order) => (
+                        <OrderCard
+                          key={order._id}
+                          order={order}
+                          onClick={() => navigate(`/orders/${order.orderId}`)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {packedSubs.length > 0 && (
+                  <div>
+                    <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">
+                      Subscriptions — {packedSubs.length}
+                    </h2>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {packedSubs.map((sub) => (
+                        <SubCard
+                          key={sub._id}
+                          sub={sub}
+                          actionLabel="Mark Delivered"
+                          actionIcon={CheckCircle2}
+                          onAction={() => handleSubDeliver(sub.subscriptionId)}
+                          acting={deliveringSubId === sub.subscriptionId}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )
           )}

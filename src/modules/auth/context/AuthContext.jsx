@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     storage.clearAuth();
     setUser(null);
-    window.location.href = "/login";
+    window.location.href = "/#/login";
   };
 
   return (

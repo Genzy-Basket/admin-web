@@ -94,7 +94,7 @@ export const ToastProvider = ({ children, duration = 4000 }) => {
       localStorage.removeItem("user");
       localStorage.removeItem("adminToken");
       localStorage.removeItem("admin");
-      window.location.href = "/login";
+      window.location.href = "/#/login";
     };
     window.addEventListener("auth:logout", handleLogout);
     return () => window.removeEventListener("auth:logout", handleLogout);
