@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      // Redirect all paths to index.html for SPA routing
+      // GitHub Pages serves this on 404, which handles BrowserRouter refresh
+      var path = window.location.pathname + window.location.search + window.location.hash;
+      window.location.replace('/' + '?p=' + encodeURIComponent(path));
+    </script>
+  </head>
+</html>

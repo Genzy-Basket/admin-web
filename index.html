@@ -2,12 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/admin-web/logo_icon.png" />
+    <link rel="icon" type="image/png" href="/logo_icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/src/style.css" rel="stylesheet" />
     <title>Genzy Basket Admin Site</title>
-    <script type="module" crossorigin src="/admin-web/assets/index-BBG5KY3Z.js"></script>
-    <link rel="stylesheet" crossorigin href="/admin-web/assets/index-DgfS9_um.css">
+    <script>
+      // Handle GitHub Pages 404.html redirect for BrowserRouter
+      (function () {
+        var redir = new URLSearchParams(window.location.search).get('p');
+        if (redir) window.history.replaceState(null, '', redir);
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-jx4phWub.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DgfS9_um.css">
   </head>
   <body>
     <div id="root"></div>
