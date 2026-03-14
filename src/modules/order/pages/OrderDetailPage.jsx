@@ -24,6 +24,7 @@ const STATUS_CONFIG = {
   pending:          { label: "Pending",          variant: "warning"   },
   confirmed:        { label: "Confirmed",         variant: "info"      },
   processing:       { label: "Processing",        variant: "primary"   },
+  packed:           { label: "Packed",            variant: "success"   },
   out_for_delivery: { label: "Out for Delivery",  variant: "warning"   },
   delivered:        { label: "Delivered",         variant: "success"   },
   cancelled:        { label: "Cancelled",         variant: "danger"    },
@@ -42,6 +43,7 @@ const PAYMENT_STATUS_CONFIG = {
 const UPDATABLE_STATUSES = [
   "confirmed",
   "processing",
+  "packed",
   "out_for_delivery",
   "delivered",
 ];

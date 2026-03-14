@@ -114,6 +114,19 @@ export const OrderProvider = ({ children }) => {
     [currentOrder],
   );
 
+  const bulkPack = useCallback(async () => {
+    try {
+      const res = await orderApi.bulkPack();
+      await fetchOrders({}, true);
+      errorBus.emit(res.message || "Bulk pack successful", "success");
+      return { success: true, modifiedCount: res.modifiedCount, message: res.message };
+    } catch (err) {
+      const message = err.message || "Bulk pack failed";
+      errorBus.emit(message, "error");
+      return { success: false, message };
+    }
+  }, [fetchOrders]);
+
   const bulkOutForDelivery = useCallback(async () => {
     try {
       const res = await orderApi.bulkOutForDelivery();
@@ -142,6 +155,7 @@ export const OrderProvider = ({ children }) => {
         updateStatus,
         confirmCodCollection,
         cancelOrder,
+        bulkPack,
         bulkOutForDelivery,
         setCurrentOrder,
       }}

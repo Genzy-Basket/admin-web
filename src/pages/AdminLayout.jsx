@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../modules/auth/context/AuthContext";
-import { Users, Package, FilePlus, ShoppingBag, LayoutDashboard, PackageCheck, Bell, Repeat } from "lucide-react";
+import { Users, Package, FilePlus, ShoppingBag, LayoutDashboard, PackageCheck, Bell, Repeat, Receipt } from "lucide-react";
 import { Header } from "../components/shared/Header";
 import { Sidebar } from "../components/shared/Sidebar";
 import { PageHeaderProvider, usePageHeader } from "../context/PageHeaderContext";
@@ -65,6 +65,7 @@ const LayoutInner = () => {
     { name: "Orders",      href: "/orders",       icon: ShoppingBag,     end: true },
     { name: "Packing",     href: "/packing",      icon: PackageCheck,    end: true },
     { name: "Subscriptions", href: "/subscriptions",  icon: Repeat,       end: true },
+    { name: "Transactions",  href: "/transactions",   icon: Receipt,      end: true },
     { name: "Notifications", href: "/notifications", icon: Bell,         end: true },
   ];
 

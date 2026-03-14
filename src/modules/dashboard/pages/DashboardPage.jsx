@@ -8,11 +8,20 @@ import {
   Truck,
   Clock,
   Save,
+  ShoppingBag,
+  IndianRupee,
+  TrendingUp,
+  Package,
+  PackageCheck,
+  Bike,
+  CircleCheck,
+  XCircle,
 } from "lucide-react";
 import { PageContainer } from "../../../components/shared";
 import { usePageMeta } from "../../../context/PageHeaderContext";
 import { productApi } from "../../../api/endpoints/product.api";
 import { settingsApi } from "../../../api/endpoints/settings.api";
+import { orderApi } from "../../../api/endpoints/order.api";
 
 // ── Session-level cache — survives navigation, cleared on page refresh ────────
 let _cache = null;
@@ -90,6 +99,9 @@ const DashboardPage = () => {
 
   const [settingsLoading, setSettingsLoading] = useState(!_cache);
 
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
   const applySettings = useCallback((d) => {
     setDeliveryCharge(d.deliveryCharge ?? 40);
     setFreeThreshold(d.freeDeliveryThreshold ?? 500);
@@ -99,6 +111,18 @@ const DashboardPage = () => {
     setCloseMinute(d.orderCloseMinute ?? 0);
     setDeliveryHour(d.deliveryByHour ?? 7);
     setDeliveryMinute(d.deliveryByMinute ?? 30);
+  }, []);
+
+  const fetchStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const res = await orderApi.getStats();
+      setStats(res.data);
+    } catch {
+      // Stats are non-critical — silently ignore
+    } finally {
+      setStatsLoading(false);
+    }
   }, []);
 
   const handleRefresh = useCallback(async () => {
@@ -114,7 +138,8 @@ const DashboardPage = () => {
     } finally {
       setSettingsLoading(false);
     }
-  }, [applySettings]);
+    fetchStats();
+  }, [applySettings, fetchStats]);
 
   usePageMeta({ title: "Dashboard", onRefresh: handleRefresh });
 
@@ -123,19 +148,20 @@ const DashboardPage = () => {
     if (_cache) {
       applySettings(_cache);
       setSettingsLoading(false);
-      return;
+    } else {
+      settingsApi
+        .get()
+        .then((res) => {
+          _cache = res.data;
+          applySettings(res.data);
+        })
+        .catch(() => {
+          setFeeStatus("error");
+          setFeeMsg("Could not load delivery settings");
+        })
+        .finally(() => setSettingsLoading(false));
     }
-    settingsApi
-      .get()
-      .then((res) => {
-        _cache = res.data;
-        applySettings(res.data);
-      })
-      .catch(() => {
-        setFeeStatus("error");
-        setFeeMsg("Could not load delivery settings");
-      })
-      .finally(() => setSettingsLoading(false));
+    fetchStats();
   }, []);
 
   const handleBustCache = async () => {
@@ -207,6 +233,78 @@ const DashboardPage = () => {
       </div>
 
       <div className="space-y-4">
+        {/* ── Order Stats Overview ──────────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <TrendingUp className="w-4 h-4 text-slate-400" />
+            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+              Overview
+            </h2>
+          </div>
+
+          {statsLoading ? (
+            <div className="flex items-center gap-2 text-slate-400 text-sm py-2">
+              <Loader2 className="w-4 h-4 animate-spin" /> Loading stats...
+            </div>
+          ) : stats ? (
+            <>
+              {/* Revenue cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                <StatCard
+                  label="Today's Orders"
+                  value={stats.today?.orders ?? 0}
+                  icon={ShoppingBag}
+                  color="emerald"
+                />
+                <StatCard
+                  label="Today's Revenue"
+                  value={`₹${(stats.today?.revenue ?? 0).toLocaleString("en-IN")}`}
+                  icon={IndianRupee}
+                  color="emerald"
+                />
+                <StatCard
+                  label="All-Time Orders"
+                  value={(stats.allTime?.orders ?? 0).toLocaleString("en-IN")}
+                  icon={ShoppingBag}
+                  color="slate"
+                />
+                <StatCard
+                  label="All-Time Revenue"
+                  value={`₹${(stats.allTime?.revenue ?? 0).toLocaleString("en-IN")}`}
+                  icon={IndianRupee}
+                  color="slate"
+                />
+              </div>
+
+              {/* Status breakdown */}
+              {stats.byStatus && Object.keys(stats.byStatus).length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">
+                    Orders by Status
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {STATUS_CHIPS.map(({ key, label, icon: Icon, color }) => {
+                      const count = stats.byStatus[key] ?? 0;
+                      if (count === 0) return null;
+                      return (
+                        <span
+                          key={key}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${color}`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          {label}: {count}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-slate-400">Could not load stats</p>
+          )}
+        </div>
+
         {/* ── Delivery Fee Settings ──────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-5">
@@ -389,5 +487,32 @@ const DashboardPage = () => {
     </PageContainer>
   );
 };
+
+// ── Stats helpers ───────────────────────────────────────────────────────────
+const STAT_COLORS = {
+  emerald: "bg-emerald-50 text-emerald-700",
+  slate: "bg-slate-50 text-slate-700",
+};
+
+const StatCard = ({ label, value, icon: Icon, color }) => (
+  <div className={`rounded-xl p-4 ${STAT_COLORS[color]}`}>
+    <div className="flex items-center gap-2 mb-1">
+      <Icon className="w-4 h-4 opacity-60" />
+      <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+        {label}
+      </span>
+    </div>
+    <p className="text-xl font-black">{value}</p>
+  </div>
+);
+
+const STATUS_CHIPS = [
+  { key: "pending", label: "Pending", icon: Clock, color: "bg-amber-50 text-amber-700" },
+  { key: "confirmed", label: "Confirmed", icon: CheckCircle2, color: "bg-blue-50 text-blue-700" },
+  { key: "packed", label: "Packed", icon: PackageCheck, color: "bg-indigo-50 text-indigo-700" },
+  { key: "out_for_delivery", label: "Out for Delivery", icon: Bike, color: "bg-violet-50 text-violet-700" },
+  { key: "delivered", label: "Delivered", icon: CircleCheck, color: "bg-emerald-50 text-emerald-700" },
+  { key: "cancelled", label: "Cancelled", icon: XCircle, color: "bg-red-50 text-red-700" },
+];
 
 export default DashboardPage;

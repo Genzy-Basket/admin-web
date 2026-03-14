@@ -48,7 +48,13 @@ export const orderApi = {
     return res.data; // { success, data: order }
   },
 
-  /** Mark all confirmed/processing orders as out_for_delivery in one shot */
+  /** Mark all confirmed/processing orders as packed in one shot */
+  bulkPack: async () => {
+    const res = await axiosClient.post("/admin/orders/bulk-pack");
+    return res.data; // { success, message, modifiedCount }
+  },
+
+  /** Mark all packed orders as out_for_delivery in one shot */
   bulkOutForDelivery: async () => {
     const res = await axiosClient.post("/admin/orders/bulk-out-for-delivery");
     return res.data; // { success, message, modifiedCount, deliveryConfig }

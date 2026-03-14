@@ -11,6 +11,7 @@ import { UserProvider } from "./modules/user/context/UserContext";
 import { ProductProvider } from "./modules/product/context/ProductContext";
 import { OrderProvider } from "./modules/order/context/OrderContext";
 import { SubscriptionProvider } from "./modules/subscription/context/SubscriptionContext";
+import { TransactionProvider } from "./modules/transaction/context/TransactionContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./pages/AdminLayout";
 import LoginPage from "./modules/auth/pages/LoginPage";
@@ -25,6 +26,7 @@ import DashboardPage from "./modules/dashboard/pages/DashboardPage";
 import NotificationsPage from "./modules/notification/pages/NotificationsPage";
 import SubscriptionsPage from "./modules/subscription/pages/SubscriptionsPage";
 import SubscriptionDetailPage from "./modules/subscription/pages/SubscriptionDetailPage";
+import TransactionsPage from "./modules/transaction/pages/TransactionsPage";
 
 function App() {
   return (
@@ -40,7 +42,9 @@ function App() {
                     <ProductProvider>
                       <OrderProvider>
                         <SubscriptionProvider>
-                          <AdminLayout />
+                          <TransactionProvider>
+                            <AdminLayout />
+                          </TransactionProvider>
                         </SubscriptionProvider>
                       </OrderProvider>
                     </ProductProvider>
@@ -62,6 +66,7 @@ function App() {
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/subscriptions" element={<SubscriptionsPage />} />
               <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetailPage />} />
+              <Route path="/transactions" element={<TransactionsPage />} />
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>

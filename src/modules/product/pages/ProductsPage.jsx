@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Plus, SlidersHorizontal, X } from "lucide-react";
+import { Search, Plus, SlidersHorizontal, X, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { useProduct } from "../context/ProductContext";
 import { PageContainer, Button } from "../../../components/shared";
 import { usePageMeta } from "../../../context/PageHeaderContext";
@@ -67,6 +67,26 @@ const ProductsPage = () => {
     setVegFilter(null);
     setCategoryFilter(null);
   };
+
+  const LOW_STOCK_THRESHOLD = 5;
+  const [showLowStock, setShowLowStock] = useState(false);
+
+  const lowStockItems = useMemo(() => {
+    const items = [];
+    for (const p of products) {
+      for (const pc of p.priceConfigs || []) {
+        if (pc.stock <= LOW_STOCK_THRESHOLD) {
+          items.push({
+            productId: p._id,
+            productName: p.name,
+            variant: `${pc.quantity} ${pc.unit}`,
+            stock: pc.stock,
+          });
+        }
+      }
+    }
+    return items;
+  }, [products]);
 
   return (
     <PageContainer>
@@ -188,6 +208,52 @@ const ProductsPage = () => {
           )}
         </div>
       </div>
+
+      {/* Low stock alert */}
+      {!loading && lowStockItems.length > 0 && (
+        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <button
+            onClick={() => setShowLowStock((v) => !v)}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <span className="text-sm font-bold text-amber-800">
+                {lowStockItems.length} item{lowStockItems.length > 1 ? "s" : ""} low on stock
+              </span>
+            </div>
+            {showLowStock ? (
+              <ChevronUp className="w-4 h-4 text-amber-600" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-amber-600" />
+            )}
+          </button>
+          {showLowStock && (
+            <div className="mt-3 space-y-1.5">
+              {lowStockItems.map((item, i) => (
+                <div
+                  key={`${item.productId}-${i}`}
+                  className="flex items-center justify-between text-sm px-2 py-1.5 bg-white rounded-lg"
+                >
+                  <span className="text-slate-700 font-medium">
+                    {item.productName}{" "}
+                    <span className="text-slate-400">({item.variant})</span>
+                  </span>
+                  <span
+                    className={`font-bold text-xs px-2 py-0.5 rounded-full ${
+                      item.stock === 0
+                        ? "bg-red-100 text-red-700"
+                        : "bg-amber-100 text-amber-700"
+                    }`}
+                  >
+                    {item.stock === 0 ? "Out of stock" : `${item.stock} left`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-20 font-bold text-slate-400">
