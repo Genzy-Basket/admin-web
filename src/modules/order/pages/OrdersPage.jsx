@@ -53,6 +53,7 @@ const STATUS_CONFIG = {
   pending:          { label: "Pending",          variant: "warning"   },
   confirmed:        { label: "Confirmed",         variant: "info"      },
   processing:       { label: "Processing",        variant: "primary"   },
+  packed:           { label: "Packed",            variant: "success"   },
   out_for_delivery: { label: "Out for Delivery",  variant: "warning"   },
   delivered:        { label: "Delivered",         variant: "success"   },
   cancelled:        { label: "Cancelled",         variant: "danger"    },
@@ -410,8 +411,9 @@ const OrdersPage = () => {
 
       {/* ── Order list ── */}
       {loading ? (
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-20" role="status">
           <div className="w-10 h-10 border-4 border-[#099E0E] border-t-transparent rounded-full animate-spin" />
+          <span className="sr-only">Loading...</span>
         </div>
       ) : orders.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center shadow-sm">

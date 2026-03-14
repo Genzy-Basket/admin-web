@@ -25,6 +25,7 @@ export const Header = ({ setIsSidebarOpen }) => {
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="p-2 rounded-xl bg-slate-50 text-slate-600 lg:hidden hover:bg-emerald-50 hover:text-[#099E0E] transition-colors border border-slate-200/50 shrink-0"
+          aria-label="Open menu"
         >
           <Menu className="w-5 h-5" />
         </button>

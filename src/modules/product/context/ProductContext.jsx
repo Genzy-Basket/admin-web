@@ -12,9 +12,7 @@ export const ProductProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const fetchProducts = useCallback(
-    async (filters = {}, force = false) => {
-      if (!force && products.length > 0) return;
-
+    async (filters = {}) => {
       setLoading(true);
       try {
         const response = await productApi.getAll(filters);
@@ -27,7 +25,7 @@ export const ProductProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [products.length],
+    [],
   );
 
   const addProduct = async (file, itemData) => {

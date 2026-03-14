@@ -1,6 +1,7 @@
 import React from "react";
 import { Upload, X } from "lucide-react";
 import { Card, FormInput } from "./shared";
+import { errorBus } from "../api/errorBus";
 
 /**
  * Reusable image upload section component
@@ -25,13 +26,13 @@ const ImageUploadSection = ({
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      errorBus.emit("Please select an image file", "error");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image size should be less than 5MB");
+      errorBus.emit("Image size should be less than 5MB", "error");
       return;
     }
 

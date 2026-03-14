@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Info, Percent, Tag } from "lucide-react";
 import { useProductQueue } from "../hooks/useProductQueue";
 import {
@@ -28,6 +28,15 @@ const NewProductPage = () => {
 
   // No refresh button on the Add Product page
   usePageMeta({ title: "Add Product" });
+
+  // Revoke blob URL on cleanup to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (imagePreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

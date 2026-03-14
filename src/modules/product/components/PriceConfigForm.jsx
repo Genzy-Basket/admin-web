@@ -48,7 +48,7 @@ const PriceConfigForm = ({
             className="relative border-none shadow-sm bg-slate-50 ring-1 ring-slate-200 animate-in fade-in slide-in-from-top-2"
           >
             <div className="flex flex-col gap-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                 <div className="md:col-span-2 lg:col-span-2">
                   <FormInput
                     label="Display Label"
@@ -119,6 +119,7 @@ const PriceConfigForm = ({
                       onClick={() => onRemove(index)}
                       className="mb-1 p-2.5 text-rose-500 hover:bg-rose-100 rounded-xl transition-all"
                       title="Remove variant"
+                      aria-label="Remove price config"
                     >
                       <Trash2 size={20} />
                     </button>

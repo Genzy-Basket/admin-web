@@ -4,6 +4,7 @@ const FormInput = ({
   type = "text",
   value,
   onChange,
+  onKeyDown,
   placeholder,
   required = false,
   min,
@@ -27,6 +28,7 @@ const FormInput = ({
         name={name}
         value={value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         required={required}
         min={min}

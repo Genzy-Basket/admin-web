@@ -3,7 +3,9 @@ const Table = ({ children, className = "" }) => {
     <div
       className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden ${className}`}
     >
-      <table className="w-full text-left border-collapse">{children}</table>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">{children}</table>
+      </div>
     </div>
   );
 };
@@ -26,7 +28,7 @@ const TableHeaderCell = ({ children, align = "left", className = "" }) => {
   };
 
   return (
-    <th className={`px-6 py-4 ${alignClass[align]} ${className}`}>
+    <th scope="col" className={`px-6 py-4 ${alignClass[align]} ${className}`}>
       {children}
     </th>
   );
