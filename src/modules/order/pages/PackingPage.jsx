@@ -155,30 +155,38 @@ const OrderCard = ({ order, onClick, actionLabel, actionIcon: ActionIcon, onActi
 );
 
 // ── Subscription card (minimal) ─────────────────────────────────────────────
-const SubCard = ({ sub, actionLabel, actionIcon: ActionIcon, onAction, acting }) => (
+const SubCard = ({ sub, actionLabel, actionIcon: ActionIcon, onAction, acting, onNavigate }) => (
   <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-    <div className="flex items-start justify-between gap-3 mb-2">
-      <div>
-        <p className="text-sm font-semibold text-slate-800">
-          {sub.userId?.fullName || "—"}
-        </p>
-        {sub.userId?.phoneNumber && (
-          <span className="flex items-center gap-1 text-xs text-slate-400 mt-0.5">
-            <Phone className="w-3 h-3" />
-            {sub.userId.phoneNumber}
-          </span>
-        )}
-      </div>
-      <Badge variant="primary" size="xs">Subscription</Badge>
-    </div>
-
-    <div className="space-y-1">
-      {sub.items?.map((item, i) => (
-        <div key={i} className="flex items-center justify-between text-xs">
-          <span className="text-slate-600">{item.productSnapshot?.name ?? "Unknown"}</span>
-          <span className="font-bold text-slate-700">{item.quantity} x {item.displayLabel}</span>
+    <div
+      className="cursor-pointer"
+      onClick={onNavigate}
+    >
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div>
+          <p className="text-sm font-semibold text-slate-800">
+            {sub.userId?.fullName || "—"}
+          </p>
+          {sub.userId?.phoneNumber && (
+            <span className="flex items-center gap-1 text-xs text-slate-400 mt-0.5">
+              <Phone className="w-3 h-3" />
+              {sub.userId.phoneNumber}
+            </span>
+          )}
         </div>
-      ))}
+        <div className="flex items-center gap-2">
+          <Badge variant="primary" size="xs">Subscription</Badge>
+          <ChevronRight className="w-4 h-4 text-slate-400" />
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        {sub.items?.map((item, i) => (
+          <div key={i} className="flex items-center justify-between text-xs">
+            <span className="text-slate-600">{item.productSnapshot?.name ?? "Unknown"}</span>
+            <span className="font-bold text-slate-700">{item.quantity} x {item.displayLabel}</span>
+          </div>
+        ))}
+      </div>
     </div>
 
     {onAction && (
@@ -506,6 +514,7 @@ const PackingPage = () => {
                     actionIcon={PackageCheck}
                     onAction={() => handleSubPack(sub.subscriptionId)}
                     acting={packingSubId === sub.subscriptionId}
+                    onNavigate={() => navigate(`/subscriptions/${sub._id}`)}
                   />
                 ))}
               </div>
@@ -586,6 +595,7 @@ const PackingPage = () => {
                           actionIcon={CheckCircle2}
                           onAction={() => handleSubDeliver(sub.subscriptionId)}
                           acting={deliveringSubId === sub.subscriptionId}
+                          onNavigate={() => navigate(`/subscriptions/${sub._id}`)}
                         />
                       ))}
                     </div>

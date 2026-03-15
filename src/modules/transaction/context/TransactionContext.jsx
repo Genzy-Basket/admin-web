@@ -19,6 +19,12 @@ export const TransactionProvider = ({ children }) => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentFilters, setPaymentFilters] = useState({});
 
+  // Subscription payments
+  const [subPayments, setSubPayments] = useState([]);
+  const [subPaymentPagination, setSubPaymentPagination] = useState(null);
+  const [subPaymentLoading, setSubPaymentLoading] = useState(false);
+  const [subPaymentFilters, setSubPaymentFilters] = useState({});
+
   const fetchStats = useCallback(async (force = false) => {
     if (!force && stats) return;
     try {
@@ -59,6 +65,21 @@ export const TransactionProvider = ({ children }) => {
     }
   }, [payments.length, paymentFilters]);
 
+  const fetchSubPayments = useCallback(async (filters = {}, force = false) => {
+    if (!force && subPayments.length > 0 && JSON.stringify(filters) === JSON.stringify(subPaymentFilters)) return;
+    setSubPaymentLoading(true);
+    setSubPaymentFilters(filters);
+    try {
+      const res = await transactionApi.getSubscriptionPayments(filters);
+      setSubPayments(res.subscriptions || []);
+      setSubPaymentPagination(res.pagination || null);
+    } catch (err) {
+      errorBus.emit(err.message || "Failed to load subscription payments", "error");
+    } finally {
+      setSubPaymentLoading(false);
+    }
+  }, [subPayments.length, subPaymentFilters]);
+
   return (
     <TransactionContext.Provider
       value={{
@@ -74,8 +95,14 @@ export const TransactionProvider = ({ children }) => {
         fetchStats,
         fetchWallet,
         fetchPayments,
+        subPayments,
+        subPaymentPagination,
+        subPaymentLoading,
+        subPaymentFilters,
+        fetchSubPayments,
         setWalletFilters,
         setPaymentFilters,
+        setSubPaymentFilters,
       }}
     >
       {children}

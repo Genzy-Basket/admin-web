@@ -6,6 +6,7 @@ const LogoutButton = () => {
   const { logout, user } = useAuth();
 
   const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
     logout();
     navigate("/login");
   };

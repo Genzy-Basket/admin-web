@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Wallet, CreditCard, ArrowUpCircle, ArrowDownCircle,
   Search, ChevronLeft, ChevronRight,
-  Phone, IndianRupee, X,
+  Phone, IndianRupee, X, Repeat,
 } from "lucide-react";
 import { useTransactions } from "../context/TransactionContext";
 import { usePageMeta } from "../../../context/PageHeaderContext";
@@ -12,6 +12,7 @@ import { PageContainer, Badge } from "../../../components/shared";
 const TABS = [
   { key: "wallet", label: "Wallet", icon: Wallet },
   { key: "payments", label: "Order Payments", icon: CreditCard },
+  { key: "subscriptions", label: "Subscriptions", icon: Repeat },
 ];
 
 // ── Wallet transaction type/status configs ───────────────────────────────────
@@ -452,6 +453,115 @@ const PaymentsTable = ({ payments, loading, onOrderClick }) => {
   );
 };
 
+// ── Subscription Payments ────────────────────────────────────────────────────
+const SubPaymentsTable = ({ subscriptions, loading, onSubClick }) => {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="w-10 h-10 border-4 border-[#099E0E] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!subscriptions.length) {
+    return (
+      <div className="bg-white rounded-2xl border border-slate-200 p-12 sm:p-16 text-center shadow-sm">
+        <Repeat className="w-10 h-10 sm:w-12 sm:h-12 text-slate-300 mx-auto mb-3" />
+        <p className="font-bold text-slate-500">No subscription payments found</p>
+        <p className="text-sm text-slate-400 mt-1">Adjust your filters or date range</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      {/* Desktop table */}
+      <div className="hidden lg:block overflow-x-auto">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="border-b border-slate-100">
+              <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Subscription</th>
+              <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">User</th>
+              <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Method</th>
+              <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Amount</th>
+              <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Payment</th>
+              <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Status</th>
+              <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {subscriptions.map((sub) => (
+              <tr
+                key={sub._id}
+                onClick={() => onSubClick(sub._id)}
+                className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors cursor-pointer"
+              >
+                <td className="px-4 py-3">
+                  <span className="font-mono text-xs font-bold text-[#099E0E]">#{sub.subscriptionId}</span>
+                </td>
+                <td className="px-4 py-3"><UserCell user={sub.userId} /></td>
+                <td className="px-4 py-3">
+                  <Badge variant={PAYMENT_METHOD_CONFIG[sub.paymentMethod]?.variant || "secondary"} size="xs">
+                    {PAYMENT_METHOD_CONFIG[sub.paymentMethod]?.label || sub.paymentMethod}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3 font-black text-slate-800">
+                  {fmtAmount(sub.totalAmount)}
+                </td>
+                <td className="px-4 py-3">
+                  <Badge variant={PAYMENT_STATUS_CONFIG[sub.paymentStatus]?.variant || "secondary"} size="xs">
+                    {PAYMENT_STATUS_CONFIG[sub.paymentStatus]?.label || sub.paymentStatus}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3">
+                  <Badge variant={ORDER_STATUS_CONFIG[sub.status]?.variant || "secondary"} size="xs">
+                    {ORDER_STATUS_CONFIG[sub.status]?.label || sub.status}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{fmtDate(sub.paidAt || sub.createdAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {subscriptions.map((sub) => (
+          <div
+            key={sub._id}
+            onClick={() => onSubClick(sub._id)}
+            className="p-3.5 cursor-pointer active:bg-slate-50 transition-colors"
+          >
+            <div className="flex items-start justify-between gap-2 mb-1.5">
+              <div className="min-w-0">
+                <span className="font-mono text-xs font-bold text-[#099E0E]">#{sub.subscriptionId}</span>
+                <p className="text-sm font-semibold text-slate-800 truncate">{sub.userId?.fullName || "—"}</p>
+                {sub.userId?.phoneNumber && (
+                  <span className="flex items-center gap-0.5 text-[11px] text-slate-400">
+                    <Phone className="w-3 h-3" />
+                    {sub.userId.phoneNumber}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm font-black text-slate-800 shrink-0">{fmtAmount(sub.totalAmount)}</span>
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Badge variant={PAYMENT_METHOD_CONFIG[sub.paymentMethod]?.variant || "secondary"} size="xs">
+                {PAYMENT_METHOD_CONFIG[sub.paymentMethod]?.label || sub.paymentMethod}
+              </Badge>
+              <Badge variant={PAYMENT_STATUS_CONFIG[sub.paymentStatus]?.variant || "secondary"} size="xs">
+                {PAYMENT_STATUS_CONFIG[sub.paymentStatus]?.label || sub.paymentStatus}
+              </Badge>
+              <span className="text-[11px] text-slate-400 ml-auto">{fmtDate(sub.paidAt || sub.createdAt)}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // ── Main Page ────────────────────────────────────────────────────────────────
 const TransactionsPage = () => {
   const navigate = useNavigate();
@@ -461,13 +571,15 @@ const TransactionsPage = () => {
     stats,
     walletTxns, walletPagination, walletLoading, walletFilters,
     payments, paymentPagination, paymentLoading, paymentFilters,
-    fetchStats, fetchWallet, fetchPayments,
+    subPayments, subPaymentPagination, subPaymentLoading, subPaymentFilters,
+    fetchStats, fetchWallet, fetchPayments, fetchSubPayments,
   } = useTransactions();
 
   useEffect(() => {
     fetchStats();
     fetchWallet(walletFilters);
     fetchPayments(paymentFilters);
+    fetchSubPayments(subPaymentFilters);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   usePageMeta({
@@ -475,7 +587,8 @@ const TransactionsPage = () => {
     onRefresh: () => {
       fetchStats(true);
       if (tab === "wallet") fetchWallet(walletFilters, true);
-      else fetchPayments(paymentFilters, true);
+      else if (tab === "payments") fetchPayments(paymentFilters, true);
+      else fetchSubPayments(subPaymentFilters, true);
     },
   });
 
@@ -498,13 +611,22 @@ const TransactionsPage = () => {
     fetchPayments(f, true);
   };
 
+  const handleSubPaymentFilters = (f) => {
+    fetchSubPayments(f, true);
+  };
+
+  const handleSubPaymentSearch = (search) => {
+    const f = { ...subPaymentFilters, search: search || undefined, page: 1 };
+    fetchSubPayments(f, true);
+  };
+
   return (
     <PageContainer gradient="slate">
       <h1 className="hidden sm:block text-2xl font-black text-slate-900 mb-6">Transactions</h1>
 
       {/* ── Stats ── */}
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-5">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 mb-5">
           <StatCard
             label="Wallet Credited"
             value={fmtAmount(stats.wallet?.credited?.total)}
@@ -532,6 +654,13 @@ const TransactionsPage = () => {
             sub={`${(stats.payments?.cod_pending?.count || 0) + (stats.payments?.cod_success?.count || 0)} orders`}
             icon={IndianRupee}
             color="bg-amber-50 text-amber-600"
+          />
+          <StatCard
+            label="Sub. Payments"
+            value={fmtAmount((stats.subscriptionPayments?.online?.total || 0) + (stats.subscriptionPayments?.wallet?.total || 0))}
+            sub={`${(stats.subscriptionPayments?.online?.count || 0) + (stats.subscriptionPayments?.wallet?.count || 0)} subscriptions`}
+            icon={Repeat}
+            color="bg-purple-50 text-purple-600"
           />
         </div>
       )}
@@ -628,6 +757,47 @@ const TransactionsPage = () => {
           <Pagination
             pagination={paymentPagination}
             onPage={(page) => fetchPayments({ ...paymentFilters, page }, true)}
+          />
+        </>
+      )}
+
+      {/* ── Subscriptions tab ── */}
+      {tab === "subscriptions" && (
+        <>
+          <FilterBar
+            filters={subPaymentFilters}
+            onChange={handleSubPaymentFilters}
+            onSearch={handleSubPaymentSearch}
+            searchPlaceholder="Search subscription ID, txn ID..."
+            options={[
+              {
+                key: "method",
+                label: "All Methods",
+                values: [
+                  { value: "online", label: "Online" },
+                  { value: "wallet", label: "Wallet" },
+                ],
+              },
+              {
+                key: "paymentStatus",
+                label: "All Status",
+                values: [
+                  { value: "success", label: "Paid" },
+                  { value: "pending", label: "Pending" },
+                  { value: "failed", label: "Failed" },
+                  { value: "refunded", label: "Refunded" },
+                ],
+              },
+            ]}
+          />
+          <SubPaymentsTable
+            subscriptions={subPayments}
+            loading={subPaymentLoading}
+            onSubClick={(id) => navigate(`/subscriptions/${id}`)}
+          />
+          <Pagination
+            pagination={subPaymentPagination}
+            onPage={(page) => fetchSubPayments({ ...subPaymentFilters, page }, true)}
           />
         </>
       )}
