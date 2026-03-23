@@ -12,6 +12,7 @@ import { ProductProvider } from "./modules/product/context/ProductContext";
 import { OrderProvider } from "./modules/order/context/OrderContext";
 import { SubscriptionProvider } from "./modules/subscription/context/SubscriptionContext";
 import { TransactionProvider } from "./modules/transaction/context/TransactionContext";
+import { DishProvider } from "./modules/dish/context/DishContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./pages/AdminLayout";
 import LoginPage from "./modules/auth/pages/LoginPage";
@@ -27,6 +28,9 @@ import NotificationsPage from "./modules/notification/pages/NotificationsPage";
 import SubscriptionsPage from "./modules/subscription/pages/SubscriptionsPage";
 import SubscriptionDetailPage from "./modules/subscription/pages/SubscriptionDetailPage";
 import TransactionsPage from "./modules/transaction/pages/TransactionsPage";
+import DishesPage from "./modules/dish/pages/DishesPage";
+import NewDishPage from "./modules/dish/pages/NewDishPage";
+import EditDishPage from "./modules/dish/pages/EditDishPage";
 
 function App() {
   return (
@@ -43,7 +47,9 @@ function App() {
                       <OrderProvider>
                         <SubscriptionProvider>
                           <TransactionProvider>
-                            <AdminLayout />
+                            <DishProvider>
+                              <AdminLayout />
+                            </DishProvider>
                           </TransactionProvider>
                         </SubscriptionProvider>
                       </OrderProvider>
@@ -67,6 +73,9 @@ function App() {
               <Route path="/subscriptions" element={<SubscriptionsPage />} />
               <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetailPage />} />
               <Route path="/transactions" element={<TransactionsPage />} />
+              <Route path="/dishes" element={<DishesPage />} />
+              <Route path="/dishes/add" element={<NewDishPage />} />
+              <Route path="/dishes/edit/:dishId" element={<EditDishPage />} />
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>

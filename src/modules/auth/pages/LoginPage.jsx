@@ -16,9 +16,14 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const inputRefs = useRef([]);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) navigate("/dashboard", { replace: true });
+  }, [isAuthenticated, navigate]);
 
   // Countdown timer for resend
   useEffect(() => {
