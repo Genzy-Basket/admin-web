@@ -53,9 +53,9 @@ const PriceConfigForm = ({
                   <FormInput
                     label="Display Label"
                     placeholder="e.g. Small Pack"
-                    value={config.displayLabel}
+                    value={config.label}
                     onChange={(e) =>
-                      onUpdate(index, "displayLabel", e.target.value)
+                      onUpdate(index, "label", e.target.value)
                     }
                     vPadding="py-2.5"
                   />
@@ -66,8 +66,8 @@ const PriceConfigForm = ({
                   label="Quantity"
                   type="number"
                   placeholder="1"
-                  value={config.quantity}
-                  onChange={(e) => onUpdate(index, "quantity", e.target.value)}
+                  value={config.qty}
+                  onChange={(e) => onUpdate(index, "qty", e.target.value)}
                   vPadding="py-2.5"
                 />
 
@@ -85,8 +85,8 @@ const PriceConfigForm = ({
                   label="Sale Price (₹)"
                   type="number"
                   placeholder="0.00"
-                  value={config.price}
-                  onChange={(e) => onUpdate(index, "price", e.target.value)}
+                  value={config.sellingPrice}
+                  onChange={(e) => onUpdate(index, "sellingPrice", e.target.value)}
                   vPadding="py-2.5"
                 />
 
@@ -129,12 +129,12 @@ const PriceConfigForm = ({
             </div>
 
             {/* Profit Margin Indicator */}
-            {config.price &&
+            {config.sellingPrice &&
               config.mrp &&
-              Number(config.mrp) > Number(config.price) && (
+              Number(config.mrp) > Number(config.sellingPrice) && (
                 <div className="absolute top-3 right-3 bg-emerald-500 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-sm">
                   {Math.round(
-                    ((Number(config.mrp) - Number(config.price)) /
+                    ((Number(config.mrp) - Number(config.sellingPrice)) /
                       Number(config.mrp)) *
                       100,
                   )}

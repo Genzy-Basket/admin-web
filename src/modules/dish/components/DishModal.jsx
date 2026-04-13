@@ -10,7 +10,7 @@ const DishModal = ({ dish, isOpen, onClose }) => {
       <div className="flex flex-col gap-5">
         {/* Image */}
         <img
-          src={dish.imageUrl}
+          src={dish.dishImages?.[0]}
           alt={dish.title}
           className="w-full h-48 sm:h-56 object-cover rounded-xl"
           onError={(e) => {
@@ -109,7 +109,7 @@ const DishModal = ({ dish, isOpen, onClose }) => {
                     className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100"
                   >
                     <img
-                      src={product?.imageUrl}
+                      src={product?.images?.[0]}
                       alt={product?.name}
                       className="w-10 h-10 rounded-lg object-cover"
                       onError={(e) => {

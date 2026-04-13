@@ -1,4 +1,6 @@
 // constants.js
+export const PRODUCT_TYPES = ["VEGETABLE", "FRUIT", "DAIRY", "GROCERY"];
+
 export const PRODUCT_CATEGORIES = [
   "vegetables",
   "fruits",
@@ -46,7 +48,9 @@ export const INGREDIENT_STATUSES = ["essential", "optional", "seasonal"];
 export const INITIAL_DISH_FORM_STATE = {
   title: "",
   description: "",
-  imageUrl: "",
+  dishImages: [],       // array of { url, file, isNew }
+  instructionImages: [], // array of { url, file, isNew }
+  videoFile: null,
   videoUrl: "",
   prepTimeMinutes: "",
   calories: "",
@@ -63,21 +67,26 @@ export const INITIAL_DISH_FORM_STATE = {
 
 export const INITIAL_FORM_STATE = {
   name: "",
+  localName: "",
   brand: "",
   description: "",
+  productType: "GROCERY",
   category: "vegetables",
   subCategory: "",
-  isVeg: true,
-  isFMCG: false,
   available: true,
   taxRate: 0,
   keywords: [],
+  tags: [],
+  shelfLife: "",
+  storageInstructions: "",
+  isOrganic: false,
+  servesWith: [],
   priceConfigs: [
     {
-      displayLabel: "Small Pack",
-      quantity: 1,
+      label: "Small Pack",
+      qty: 1,
       unit: "kg",
-      price: "",
+      sellingPrice: "",
       mrp: "",
       stock: 0,
     },

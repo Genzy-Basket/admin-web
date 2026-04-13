@@ -67,4 +67,57 @@ export const mediaApi = {
       throw error;
     }
   },
+
+  /**
+   * Upload video file to Cloudinary
+   * @param {File} file - Video file to upload
+   * @param {string} folder - Upload folder (default: 'dishes')
+   * @param {Function} onProgress - Progress callback
+   * @param {AbortSignal} signal - Optional abort signal
+   * @returns {Promise<string>} Secure URL of uploaded video
+   */
+  uploadVideoToCloudinary: async (
+    file,
+    folder = "dishes",
+    onProgress = null,
+    signal = null,
+  ) => {
+    try {
+      const {
+        timestamp,
+        signature,
+        apiKey,
+        cloudName,
+        folder: uploadFolder,
+      } = await mediaApi.getSignature(folder);
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("timestamp", timestamp);
+      formData.append("signature", signature);
+      formData.append("api_key", apiKey);
+      formData.append("folder", uploadFolder);
+
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+        formData,
+        {
+          signal,
+          onUploadProgress: (progressEvent) => {
+            if (onProgress && progressEvent.total) {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total,
+              );
+              onProgress(percentCompleted);
+            }
+          },
+        },
+      );
+
+      return response.data.secure_url;
+    } catch (error) {
+      if (import.meta.env.DEV) console.error("Cloudinary video upload error:", error);
+      throw error;
+    }
+  },
 };

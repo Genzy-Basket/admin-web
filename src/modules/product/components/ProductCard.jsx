@@ -32,7 +32,7 @@ const ProductCard = memo(({ product, onView }) => {
           onClick={() => onView(product)}
         >
           <img
-            src={product.imageUrl}
+            src={product.images?.[0]}
             alt={product.name}
             className="w-full h-full object-cover"
           />
@@ -87,7 +87,7 @@ const ProductCard = memo(({ product, onView }) => {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={confirmDelete}
         itemName={product.name}
-        itemImage={product.imageUrl}
+        itemImage={product.images?.[0]}
       />
     </>
   );

@@ -13,6 +13,9 @@ import {
   Flame,
   Users,
   Loader2,
+  Video,
+  Upload,
+  X,
 } from "lucide-react";
 import {
   Card,
@@ -24,23 +27,25 @@ import {
 import { MEAL_TYPES, DIETARY_TAGS, CUISINES } from "../../../constants";
 import { usePageMeta } from "../../../context/PageHeaderContext";
 import { useDish } from "../context/DishContext";
+import UploadProgressOverlay from "../components/UploadProgressOverlay";
 import { useProduct } from "../../product/context/ProductContext";
-import ImageUploadSection from "../../../components/ImageUploadSection";
+import MultiImageUpload from "../components/MultiImageUpload";
 import KeywordManager from "../../product/components/KeywordManager";
-import { IngredientPicker, IngredientRow } from "../components/IngredientPicker";
+import {
+  IngredientPicker,
+  IngredientRow,
+} from "../components/IngredientPicker";
 import InstructionEditor from "../components/InstructionEditor";
 import toast from "react-hot-toast";
 
 const EditDishPage = () => {
   const { dishId } = useParams();
   const navigate = useNavigate();
-  const { getDishById, updateDish } = useDish();
+  const { getDishById, updateDish, uploadStatus } = useDish();
   const { products, fetchProducts } = useProduct();
 
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
   const [showIngredientPicker, setShowIngredientPicker] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -67,8 +72,24 @@ const EditDishPage = () => {
           status: ing.status,
         }));
 
+        // Convert existing images to the { url, file, isNew } format
+        const existingDishImages = (dish.dishImages || []).map((url) => ({
+          url,
+          file: null,
+          isNew: false,
+        }));
+        const existingInstrImages = (dish.instructionImages || []).map(
+          (url) => ({
+            url,
+            file: null,
+            isNew: false,
+          }),
+        );
+
         setFormData({
           ...dish,
+          dishImages: existingDishImages,
+          instructionImages: existingInstrImages,
           ingredients,
           instructions:
             dish.instructions?.length > 0 ? dish.instructions : [""],
@@ -79,8 +100,9 @@ const EditDishPage = () => {
           calories: dish.calories || "",
           prepTimeMinutes: dish.prepTimeMinutes || "",
           servesCount: dish.servesCount || 1,
+          videoFile: null,
+          videoUrl: dish.videoUrl || "",
         });
-        setImagePreview(dish.imageUrl);
       } catch {
         toast.error("Failed to load dish");
         navigate("/dishes");
@@ -114,8 +136,8 @@ const EditDishPage = () => {
     }));
   };
 
-  const addIngredient = (ingredient) => {
-    handleFieldChange("ingredients", [...formData.ingredients, ingredient]);
+  const addIngredients = (items) => {
+    handleFieldChange("ingredients", [...formData.ingredients, ...items]);
   };
 
   const updateIngredient = (index, field, value) => {
@@ -138,8 +160,8 @@ const EditDishPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!imageFile && !formData.imageUrl) {
-      return toast.error("Please provide an image");
+    if (formData.dishImages.length === 0) {
+      return toast.error("Please add at least one image");
     }
     if (!formData.title.trim()) {
       return toast.error("Title is required");
@@ -161,8 +183,10 @@ const EditDishPage = () => {
       const payload = {
         title: formData.title,
         description: formData.description,
-        imageUrl: formData.imageUrl,
-        videoUrl: formData.videoUrl,
+        dishImages: formData.dishImages,
+        instructionImages: formData.instructionImages,
+        videoFile: formData.videoFile || null,
+        videoUrl: formData.videoUrl?.trim() || "",
         prepTimeMinutes: Number(formData.prepTimeMinutes),
         calories: formData.calories ? Number(formData.calories) : undefined,
         servesCount: Number(formData.servesCount) || 1,
@@ -176,7 +200,7 @@ const EditDishPage = () => {
         ingredients: formData.ingredients.map(({ _product, ...rest }) => rest),
       };
 
-      await updateDish(dishId, payload, imageFile);
+      await updateDish(dishId, payload);
       toast.success("Dish updated successfully");
       navigate("/dishes");
     } catch {
@@ -189,11 +213,7 @@ const EditDishPage = () => {
   return (
     <div className="max-w-7xl mx-auto pb-20">
       <div className="flex justify-between items-center mb-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="gap-2"
-        >
+        <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
           <ArrowLeft size={18} /> Back
         </Button>
         <div className="text-right hidden sm:block">
@@ -407,11 +427,7 @@ const EditDishPage = () => {
             padding="lg"
             className="border-none shadow-sm bg-white ring-1 ring-slate-200"
           >
-            <SectionHeader
-              icon={ListOrdered}
-              title="Instructions"
-              size="sm"
-            />
+            <SectionHeader icon={ListOrdered} title="Instructions" size="sm" />
             <div className="mt-4">
               <InstructionEditor
                 instructions={formData.instructions}
@@ -423,20 +439,80 @@ const EditDishPage = () => {
 
         {/* Right column */}
         <div className="lg:col-span-5 space-y-6">
-          <ImageUploadSection
-            imagePreview={imagePreview}
-            imageFile={imageFile}
-            imageUrl={formData.imageUrl}
-            onImageChange={(file) => {
-              setImageFile(file);
-              setImagePreview(URL.createObjectURL(file));
-            }}
-            onRemoveImage={() => {
-              setImageFile(null);
-              setImagePreview(formData.imageUrl);
-            }}
-            onImageUrlChange={(val) => handleFieldChange("imageUrl", val)}
-          />
+          <Card
+            padding="lg"
+            className="border-none shadow-sm bg-white ring-1 ring-slate-200"
+          >
+            <SectionHeader icon={Upload} title="Media" size="sm" />
+            <div className="mt-6 space-y-6">
+              {/* Dish Images */}
+              <div>
+                <MultiImageUpload
+                  images={formData.dishImages}
+                  onImagesChange={(imgs) =>
+                    handleFieldChange("dishImages", imgs)
+                  }
+                />
+              </div>
+
+              <hr className="border-slate-200" />
+
+              {/* Video */}
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">
+                  <Video size={14} className="inline mr-1.5 -mt-0.5" />
+                  Video
+                </label>
+                {formData.videoFile || formData.videoUrl ? (
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                    <Video size={20} className="text-[#099E0E] shrink-0" />
+                    <span className="text-sm text-slate-700 truncate flex-1">
+                      {formData.videoFile?.name || formData.videoUrl}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleFieldChange("videoFile", null);
+                        handleFieldChange("videoUrl", "");
+                      }}
+                      className="p-1 hover:bg-red-50 text-red-500 rounded-full"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold cursor-pointer transition-colors text-sm">
+                    <Upload size={16} />
+                    Upload Video
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFieldChange("videoFile", file);
+                        e.target.value = "";
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+
+              <hr className="border-slate-200" />
+
+              {/* Instruction Images */}
+              <div>
+                <MultiImageUpload
+                  title="Instruction Images"
+                  maxImages={20}
+                  images={formData.instructionImages}
+                  onImagesChange={(imgs) =>
+                    handleFieldChange("instructionImages", imgs)
+                  }
+                />
+              </div>
+            </div>
+          </Card>
 
           <Card
             padding="lg"
@@ -478,11 +554,10 @@ const EditDishPage = () => {
         onClose={() => setShowIngredientPicker(false)}
         products={products}
         existingIds={existingIngredientIds}
-        onAdd={(ing) => {
-          addIngredient(ing);
-          setShowIngredientPicker(false);
-        }}
+        onAdd={(items) => addIngredients(items)}
       />
+
+      {uploadStatus && <UploadProgressOverlay uploadStatus={uploadStatus} />}
     </div>
   );
 };

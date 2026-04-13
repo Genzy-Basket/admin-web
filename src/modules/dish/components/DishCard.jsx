@@ -34,7 +34,7 @@ const DishCard = memo(({ dish, onView }) => {
           onClick={() => onView(dish)}
         >
           <img
-            src={dish.imageUrl}
+            src={dish.dishImages?.[0]}
             alt={dish.title}
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -111,7 +111,7 @@ const DishCard = memo(({ dish, onView }) => {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={confirmDelete}
         itemName={dish.title}
-        itemImage={dish.imageUrl}
+        itemImage={dish.dishImages?.[0]}
       />
     </>
   );

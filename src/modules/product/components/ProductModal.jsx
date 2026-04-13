@@ -9,7 +9,7 @@ const ProductModal = ({ product, isOpen, onClose }) => {
       <div className="flex flex-col gap-5">
         {/* Image */}
         <img
-          src={product.imageUrl}
+          src={product.images?.[0]}
           alt={product.name}
           className="w-full h-48 sm:h-56 object-cover rounded-xl"
         />

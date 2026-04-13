@@ -11,6 +11,44 @@ export const DishProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Upload progress: { step: "Uploading dish image 1/3", progress: 45, total: 7, current: 1 }
+  const [uploadStatus, setUploadStatus] = useState(null);
+
+  /**
+   * Upload images with progress tracking
+   */
+  async function resolveImages(images, label, startIdx, totalSteps) {
+    const urls = [];
+    let fileCount = 0;
+    const newFiles = images.filter((img) => img.file);
+    for (const img of images) {
+      if (img.file) {
+        fileCount++;
+        const stepLabel = `Uploading ${label} ${fileCount}/${newFiles.length}`;
+        setUploadStatus({ step: stepLabel, progress: 0, current: startIdx + fileCount, total: totalSteps });
+        const url = await mediaApi.uploadToCloudinary(img.file, "dish_images", (pct) => {
+          setUploadStatus((prev) => prev ? { ...prev, progress: pct } : null);
+        });
+        urls.push(url);
+      } else {
+        urls.push(img.url);
+      }
+    }
+    return { urls, uploadCount: fileCount };
+  }
+
+  /**
+   * Count total upload steps for progress display
+   */
+  function countSteps(dishData) {
+    let steps = 0;
+    for (const img of dishData.dishImages || []) if (img.file) steps++;
+    if (dishData.videoFile) steps++;
+    for (const img of dishData.instructionImages || []) if (img.file) steps++;
+    steps++; // saving to DB
+    return steps;
+  }
+
   const fetchDishes = useCallback(async (filters = {}) => {
     setLoading(true);
     try {
@@ -41,13 +79,40 @@ export const DishProvider = ({ children }) => {
     [dishes],
   );
 
-  const createDish = async (file, dishData) => {
+  const createDish = async (dishData) => {
     setLoading(true);
-    try {
-      let imageUrl = dishData.imageUrl;
-      if (file) imageUrl = await mediaApi.uploadToCloudinary(file, "dishes");
+    const totalSteps = countSteps(dishData);
+    let stepIdx = 0;
 
-      const response = await dishApi.create({ ...dishData, imageUrl });
+    try {
+      // Dish images
+      const dishImgResult = await resolveImages(
+        dishData.dishImages || [], "dish image", stepIdx, totalSteps,
+      );
+      const dishImages = dishImgResult.urls;
+      stepIdx += dishImgResult.uploadCount;
+
+      // Video
+      let videoUrl = dishData.videoUrl || undefined;
+      if (dishData.videoFile) {
+        stepIdx++;
+        setUploadStatus({ step: "Uploading video", progress: 0, current: stepIdx, total: totalSteps });
+        videoUrl = await mediaApi.uploadVideoToCloudinary(dishData.videoFile, "dish_videos", (pct) => {
+          setUploadStatus((prev) => prev ? { ...prev, progress: pct } : null);
+        });
+      }
+
+      // Instruction images
+      const instrImgResult = await resolveImages(
+        dishData.instructionImages || [], "instruction image", stepIdx, totalSteps,
+      );
+      const instructionImages = instrImgResult.urls;
+      stepIdx += instrImgResult.uploadCount;
+
+      // Save
+      setUploadStatus({ step: "Saving dish...", progress: 100, current: totalSteps, total: totalSteps });
+      const { dishImages: _a, instructionImages: _b, videoFile: _c, ...rest } = dishData;
+      const response = await dishApi.create({ ...rest, dishImages, instructionImages, videoUrl });
       setDishes((prev) => [response.data, ...prev]);
       return response.data;
     } catch (err) {
@@ -57,16 +122,40 @@ export const DishProvider = ({ children }) => {
       throw err;
     } finally {
       setLoading(false);
+      setUploadStatus(null);
     }
   };
 
-  const updateDish = async (id, updateData, file = null) => {
+  const updateDish = async (id, dishData) => {
     setLoading(true);
-    try {
-      let imageUrl = updateData.imageUrl;
-      if (file) imageUrl = await mediaApi.uploadToCloudinary(file, "dishes");
+    const totalSteps = countSteps(dishData);
+    let stepIdx = 0;
 
-      const response = await dishApi.update(id, { ...updateData, imageUrl });
+    try {
+      const dishImgResult = await resolveImages(
+        dishData.dishImages || [], "dish image", stepIdx, totalSteps,
+      );
+      const dishImages = dishImgResult.urls;
+      stepIdx += dishImgResult.uploadCount;
+
+      let videoUrl = dishData.videoUrl || undefined;
+      if (dishData.videoFile) {
+        stepIdx++;
+        setUploadStatus({ step: "Uploading video", progress: 0, current: stepIdx, total: totalSteps });
+        videoUrl = await mediaApi.uploadVideoToCloudinary(dishData.videoFile, "dish_videos", (pct) => {
+          setUploadStatus((prev) => prev ? { ...prev, progress: pct } : null);
+        });
+      }
+
+      const instrImgResult = await resolveImages(
+        dishData.instructionImages || [], "instruction image", stepIdx, totalSteps,
+      );
+      const instructionImages = instrImgResult.urls;
+      stepIdx += instrImgResult.uploadCount;
+
+      setUploadStatus({ step: "Saving dish...", progress: 100, current: totalSteps, total: totalSteps });
+      const { dishImages: _a, instructionImages: _b, videoFile: _c, ...rest } = dishData;
+      const response = await dishApi.update(id, { ...rest, dishImages, instructionImages, videoUrl });
       setDishes((prev) =>
         prev.map((d) => (d._id === id ? response.data : d)),
       );
@@ -78,6 +167,7 @@ export const DishProvider = ({ children }) => {
       throw err;
     } finally {
       setLoading(false);
+      setUploadStatus(null);
     }
   };
 
@@ -103,6 +193,7 @@ export const DishProvider = ({ children }) => {
         dishes,
         loading,
         error,
+        uploadStatus,
         fetchDishes,
         getDishById,
         createDish,

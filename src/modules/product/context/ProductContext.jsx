@@ -31,10 +31,13 @@ export const ProductProvider = ({ children }) => {
   const addProduct = async (file, itemData) => {
     setLoading(true);
     try {
-      let imageUrl = itemData.imageUrl;
-      if (file) imageUrl = await mediaApi.uploadToCloudinary(file);
+      let images = itemData.images || [];
+      if (file) {
+        const url = await mediaApi.uploadToCloudinary(file, "products");
+        images = [url];
+      }
 
-      const response = await productApi.add({ ...itemData, imageUrl });
+      const response = await productApi.add({ ...itemData, images });
       setProducts((prev) => [...prev, response.data]);
       return response.data;
     } catch (err) {
@@ -50,10 +53,13 @@ export const ProductProvider = ({ children }) => {
   const updateProduct = async (id, updateData, file = null) => {
     setLoading(true);
     try {
-      let imageUrl = updateData.imageUrl;
-      if (file) imageUrl = await mediaApi.uploadToCloudinary(file);
+      let images = updateData.images || [];
+      if (file) {
+        const url = await mediaApi.uploadToCloudinary(file, "products");
+        images = [url, ...images.slice(1)];
+      }
 
-      const response = await productApi.update(id, { ...updateData, imageUrl });
+      const response = await productApi.update(id, { ...updateData, images });
       setProducts((prev) =>
         prev.map((p) => (p._id === id ? response.data : p)),
       );

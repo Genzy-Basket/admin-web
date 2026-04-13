@@ -7,27 +7,13 @@ import {
 } from "react-router-dom";
 import { ToastProvider } from "./components/ToastProvider";
 import { AuthProvider } from "./modules/auth/context/AuthContext";
-import { UserProvider } from "./modules/user/context/UserContext";
 import { ProductProvider } from "./modules/product/context/ProductContext";
-import { OrderProvider } from "./modules/order/context/OrderContext";
-import { SubscriptionProvider } from "./modules/subscription/context/SubscriptionContext";
-import { TransactionProvider } from "./modules/transaction/context/TransactionContext";
 import { DishProvider } from "./modules/dish/context/DishContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./pages/AdminLayout";
 import LoginPage from "./modules/auth/pages/LoginPage";
-import UsersPage from "./modules/user/pages/UsersPage";
 import ProductsPage from "./modules/product/pages/ProductsPage";
-import NewProductPage from "./modules/product/pages/NewProductPage";
-import EditProductPage from "./modules/product/pages/EditProductPage";
-import OrdersPage from "./modules/order/pages/OrdersPage";
-import OrderDetailPage from "./modules/order/pages/OrderDetailPage";
-import PackingPage from "./modules/order/pages/PackingPage";
-import DashboardPage from "./modules/dashboard/pages/DashboardPage";
-import NotificationsPage from "./modules/notification/pages/NotificationsPage";
-import SubscriptionsPage from "./modules/subscription/pages/SubscriptionsPage";
-import SubscriptionDetailPage from "./modules/subscription/pages/SubscriptionDetailPage";
-import TransactionsPage from "./modules/transaction/pages/TransactionsPage";
+import ProductFormPage from "./modules/product/pages/ProductFormPage";
 import DishesPage from "./modules/dish/pages/DishesPage";
 import NewDishPage from "./modules/dish/pages/NewDishPage";
 import EditDishPage from "./modules/dish/pages/EditDishPage";
@@ -42,42 +28,25 @@ function App() {
             <Route
               element={
                 <ProtectedRoute>
-                  <UserProvider>
-                    <ProductProvider>
-                      <OrderProvider>
-                        <SubscriptionProvider>
-                          <TransactionProvider>
-                            <DishProvider>
-                              <AdminLayout />
-                            </DishProvider>
-                          </TransactionProvider>
-                        </SubscriptionProvider>
-                      </OrderProvider>
-                    </ProductProvider>
-                  </UserProvider>
+                  <ProductProvider>
+                    <DishProvider>
+                      <AdminLayout />
+                    </DishProvider>
+                  </ProductProvider>
                 </ProtectedRoute>
               }
             >
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/users" element={<UsersPage />} />
               <Route path="/products" element={<ProductsPage />} />
-              <Route path="/products/add" element={<NewProductPage />} />
+              <Route path="/products/add" element={<ProductFormPage />} />
               <Route
                 path="/products/edit/:productId"
-                element={<EditProductPage />}
+                element={<ProductFormPage />}
               />
-              <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/orders/:orderId" element={<OrderDetailPage />} />
-              <Route path="/packing" element={<PackingPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/subscriptions" element={<SubscriptionsPage />} />
-              <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetailPage />} />
-              <Route path="/transactions" element={<TransactionsPage />} />
               <Route path="/dishes" element={<DishesPage />} />
               <Route path="/dishes/add" element={<NewDishPage />} />
               <Route path="/dishes/edit/:dishId" element={<EditDishPage />} />
 
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<Navigate to="/products" replace />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
