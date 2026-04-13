@@ -1,10 +1,15 @@
 import axios from "axios";
 import { errorBus } from "./errorBus";
 
-const PUBLIC_ENDPOINTS = ["/auth/admin/send-otp", "/auth/admin/verify-otp", "/auth/register", "/auth/login"];
+const PUBLIC_ENDPOINTS = [
+  "/auth/admin/send-otp",
+  "/auth/admin/verify-otp",
+  "/auth/register",
+  "/auth/login",
+];
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "https://api1.genzybasket.com/api",
   headers: { "Content-Type": "application/json" },
   timeout: 15000,
 });
@@ -16,7 +21,8 @@ axiosClient.interceptors.request.use((config) => {
   );
 
   if (!isPublic) {
-    const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+    const token =
+      localStorage.getItem("adminToken") || localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -45,7 +51,8 @@ axiosClient.interceptors.response.use(
       }
 
       if (status === 403) {
-        message = data?.message || "You don't have permission to perform this action.";
+        message =
+          data?.message || "You don't have permission to perform this action.";
       }
     } else if (error.request) {
       message = "Network error. Please check your connection.";
