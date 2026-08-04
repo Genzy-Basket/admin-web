@@ -42,7 +42,11 @@ async function request<T>(
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      // Only declare a JSON body when one is actually being sent — Fastify
+      // rejects a request that advertises application/json but has no body.
+      ...(options.body !== undefined
+        ? { "Content-Type": "application/json" }
+        : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
