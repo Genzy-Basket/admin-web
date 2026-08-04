@@ -32,11 +32,13 @@ export default function DashboardPage() {
       )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Total Partners"
-          value={stats?.totalPartners}
-          tone="slate"
-        />
+        <Link to="/partners" className="rounded-xl transition hover:opacity-80">
+          <StatCard
+            label="Total Partners"
+            value={stats?.totalPartners}
+            tone="slate"
+          />
+        </Link>
         <StatCard label="Pending Review" value={stats?.pending} tone="amber" />
         <StatCard label="Approved" value={stats?.approved} tone="emerald" />
         <StatCard label="Rejected" value={stats?.rejected} tone="red" />

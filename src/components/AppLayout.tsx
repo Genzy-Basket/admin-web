@@ -1,16 +1,20 @@
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
+import ConfirmDialog from "./ConfirmDialog";
 
 const NAV_ITEMS = [
   { to: "/", label: "Home", icon: HomeIcon, end: true },
+  { to: "/partners", label: "Partners", icon: UsersIcon, end: false },
   { to: "/kyc", label: "Pending KYC", icon: ShieldIcon, end: false },
 ];
 
 export default function AppLayout() {
   const { admin, logout } = useAuth();
+  const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white sm:flex">
         <div className="flex items-center gap-2.5 px-5 py-5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-white">
@@ -22,7 +26,7 @@ export default function AppLayout() {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-2">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-2">
           {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
@@ -50,7 +54,7 @@ export default function AppLayout() {
             <p className="truncate text-xs text-slate-500">{admin?.email}</p>
           </div>
           <button
-            onClick={logout}
+            onClick={() => setIsConfirmingSignOut(true)}
             className="mt-1 w-full rounded-lg px-2 py-1.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
           >
             Sign out
@@ -58,18 +62,18 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 sm:hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 py-3 sm:hidden">
           <span className="text-sm font-bold">Genzy Admin</span>
           <button
-            onClick={logout}
+            onClick={() => setIsConfirmingSignOut(true)}
             className="text-sm font-medium text-red-600"
           >
             Sign out
           </button>
         </header>
 
-        <nav className="flex gap-1 border-b border-slate-200 bg-white px-3 py-2 sm:hidden">
+        <nav className="flex shrink-0 gap-1 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2 sm:hidden">
           {NAV_ITEMS.map(({ to, label, end }) => (
             <NavLink
               key={to}
@@ -88,10 +92,20 @@ export default function AppLayout() {
           ))}
         </nav>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8">
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-8">
           <Outlet />
         </main>
       </div>
+
+      {isConfirmingSignOut && (
+        <ConfirmDialog
+          title="Sign out?"
+          message="You will need your password and a fresh verification code to sign back in."
+          confirmLabel="Sign out"
+          onCancel={() => setIsConfirmingSignOut(false)}
+          onConfirm={logout}
+        />
+      )}
     </div>
   );
 }
@@ -110,6 +124,25 @@ function HomeIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M3 10.5 12 3l9 7.5M5.25 9.75V20a1 1 0 0 0 1 1h11.5a1 1 0 0 0 1-1V9.75"
+      />
+    </svg>
+  );
+}
+
+function UsersIcon() {
+  return (
+    <svg
+      className="h-4.5 w-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15 19.5v-1.5a3.75 3.75 0 0 0-3.75-3.75h-4.5A3.75 3.75 0 0 0 3 18v1.5M12 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm9 12v-1.5a3.75 3.75 0 0 0-2.813-3.629M16.5 7.65a3 3 0 0 1 0 5.7"
       />
     </svg>
   );

@@ -14,6 +14,8 @@ body,
   height: 100%;
 }
 
+/* The app shell owns scrolling: only the main content area scrolls, so the
+   sidebar and headers stay put. */
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply overflow-hidden bg-slate-50 text-slate-900 antialiased;
 }

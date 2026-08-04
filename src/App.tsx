@@ -4,6 +4,8 @@ import AppLayout from "./components/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
 import KycPage from "./pages/KycPage";
 import LoginPage from "./pages/LoginPage";
+import PartnerDetailPage from "./pages/PartnerDetailPage";
+import PartnersPage from "./pages/PartnersPage";
 
 export default function App() {
   const { admin, isLoading } = useAuth();
@@ -30,6 +32,8 @@ export default function App() {
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route element={<AppLayout />}>
         <Route index element={<DashboardPage />} />
+        <Route path="partners" element={<PartnersPage />} />
+        <Route path="partners/:id" element={<PartnerDetailPage />} />
         <Route path="kyc" element={<KycPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
