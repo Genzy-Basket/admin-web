@@ -1,15 +1,63 @@
 export type KycStatus = "pending" | "approved" | "rejected";
 
+export type AdminRole = "root" | "admin" | "subAdmin";
+
+export type AdminPermission =
+  | "kycReview"
+  | "partnerManage"
+  | "jobAssign"
+  | "jobManage"
+  | "adminManage"
+  | "appRelease"
+  | "notificationSend"
+  | "legalManage"
+  | "logView";
+
 export interface Admin {
   id: string;
   name: string;
   email: string;
   phone: string | null;
-  role: string;
+  role: AdminRole;
+  permissions: AdminPermission[];
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
 }
+
+export interface AdminRoleOption {
+  value: Exclude<AdminRole, "root">;
+  label: string;
+  description: string;
+  defaultPermissions: AdminPermission[];
+}
+
+export interface AdminPermissionOption {
+  value: AdminPermission;
+  label: string;
+}
+
+export interface AdminManageOptions {
+  roles: AdminRoleOption[];
+  permissions: AdminPermissionOption[];
+}
+
+const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
+  root: "Root Admin",
+  admin: "Admin",
+  subAdmin: "Sub Admin",
+};
+
+export const adminRoleLabel = (role: AdminRole) =>
+  ADMIN_ROLE_LABELS[role] ?? role;
+
+export const isRootAdmin = (admin: Admin | null) => admin?.role === "root";
+
+export const canManageAdmins = (admin: Admin | null) =>
+  admin?.permissions?.includes("adminManage") ?? false;
+
+export const canPublishReleases = (admin: Admin | null) =>
+  admin?.permissions?.includes("appRelease") ?? false;
 
 export interface AdminSession extends Admin {
   token: string;
@@ -203,3 +251,75 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 };
 
 export const docTypeLabel = (type: string) => DOC_TYPE_LABELS[type] ?? type;
+
+export type AppKind = "partner" | "user";
+export type AppPlatform = "android" | "ios";
+
+export interface AppRelease {
+  id: string;
+  app: AppKind;
+  platform: AppPlatform;
+  versionCode: number;
+  versionName: string;
+  fileSizeBytes: number;
+  sha256: string;
+  releaseNotes: string | null;
+  minSupported: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const formatBytes = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  const mb = bytes / (1024 * 1024);
+  return mb >= 1 ? `${mb.toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`;
+};
+
+export interface ErrorLog {
+  id: string;
+  statusCode: number;
+  code: string;
+  message: string;
+  stack: string | null;
+  method: string;
+  url: string;
+  actor: string | null;
+  ip: string | null;
+  requestId: string | null;
+  createdAt: string;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ErrorLogPage {
+  items: ErrorLog[];
+  pagination: Pagination;
+}
+
+export interface LegalDocSummary {
+  id: string;
+  slug: string;
+  title: string;
+  lastUpdated: string;
+  characters: number;
+}
+
+export interface LegalDoc {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  lastUpdated: string;
+}
+
+export const canViewLogs = (admin: Admin | null) =>
+  admin?.permissions?.includes("logView") ?? false;
+
+export const canManageLegal = (admin: Admin | null) =>
+  admin?.permissions?.includes("legalManage") ?? false;

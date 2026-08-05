@@ -6,6 +6,16 @@ import KycPage from "./pages/KycPage";
 import LoginPage from "./pages/LoginPage";
 import PartnerDetailPage from "./pages/PartnerDetailPage";
 import PartnersPage from "./pages/PartnersPage";
+import ReleasesPage from "./pages/ReleasesPage";
+import AdminsPage from "./pages/AdminsPage";
+import LogsPage from "./pages/LogsPage";
+import LegalPage from "./pages/LegalPage";
+import {
+  canManageAdmins,
+  canManageLegal,
+  canPublishReleases,
+  canViewLogs,
+} from "./types";
 
 export default function App() {
   const { admin, isLoading } = useAuth();
@@ -35,6 +45,17 @@ export default function App() {
         <Route path="partners" element={<PartnersPage />} />
         <Route path="partners/:id" element={<PartnerDetailPage />} />
         <Route path="kyc" element={<KycPage />} />
+        {/* Hiding the nav link is not enough — the URL is still typeable. */}
+        {canPublishReleases(admin) && (
+          <Route path="releases" element={<ReleasesPage />} />
+        )}
+        {canManageAdmins(admin) && (
+          <Route path="admins" element={<AdminsPage />} />
+        )}
+        {canManageLegal(admin) && (
+          <Route path="legal" element={<LegalPage />} />
+        )}
+        {canViewLogs(admin) && <Route path="logs" element={<LogsPage />} />}
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
