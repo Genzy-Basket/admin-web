@@ -1,17 +1,68 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import ConfirmDialog from "./ConfirmDialog";
+import type { AdminPermission } from "../types";
 
-const NAV_ITEMS = [
+const NAV_ITEMS: {
+  to: string;
+  label: string;
+  icon: () => ReactElement;
+  end: boolean;
+  permission?: AdminPermission;
+}[] = [
   { to: "/", label: "Home", icon: HomeIcon, end: true },
-  { to: "/partners", label: "Partners", icon: UsersIcon, end: false },
-  { to: "/kyc", label: "Pending KYC", icon: ShieldIcon, end: false },
+  {
+    to: "/partners",
+    label: "Partners",
+    icon: UsersIcon,
+    end: false,
+    permission: "partnerManage",
+  },
+  {
+    to: "/kyc",
+    label: "Pending KYC",
+    icon: ShieldIcon,
+    end: false,
+    permission: "kycReview",
+  },
+  {
+    to: "/releases",
+    label: "App Releases",
+    icon: DownloadIcon,
+    end: false,
+    permission: "appRelease",
+  },
+  {
+    to: "/legal",
+    label: "Legal Pages",
+    icon: DocumentIcon,
+    end: false,
+    permission: "legalManage",
+  },
+  {
+    to: "/admins",
+    label: "Manage Admins",
+    icon: KeyIcon,
+    end: false,
+    permission: "adminManage",
+  },
+  {
+    to: "/logs",
+    label: "Server Errors",
+    icon: AlertIcon,
+    end: false,
+    permission: "logView",
+  },
 ];
 
 export default function AppLayout() {
   const { admin, logout } = useAuth();
   const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false);
+
+  const navItems = NAV_ITEMS.filter(
+    (item) => !item.permission || admin?.permissions?.includes(item.permission),
+  );
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -27,7 +78,7 @@ export default function AppLayout() {
         </div>
 
         <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-2">
-          {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+          {navItems.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
@@ -74,16 +125,14 @@ export default function AppLayout() {
         </header>
 
         <nav className="flex shrink-0 gap-1 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2 sm:hidden">
-          {NAV_ITEMS.map(({ to, label, end }) => (
+          {navItems.map(({ to, label, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
                 `rounded-lg px-3 py-1.5 text-sm font-medium ${
-                  isActive
-                    ? "bg-brand-50 text-brand-700"
-                    : "text-slate-600"
+                  isActive ? "bg-brand-50 text-brand-700" : "text-slate-600"
                 }`
               }
             >
@@ -163,7 +212,87 @@ function ShieldIcon() {
         strokeLinejoin="round"
         d="M12 3l7.5 3v5.25c0 4.5-3 8.4-7.5 9.75-4.5-1.35-7.5-5.25-7.5-9.75V6L12 3Z"
       />
-      <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 12 1.5 1.5 3-3.75" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m9.75 12 1.5 1.5 3-3.75"
+      />
+    </svg>
+  );
+}
+
+function DocumentIcon() {
+  return (
+    <svg
+      className="h-4.5 w-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+      />
+    </svg>
+  );
+}
+
+function AlertIcon() {
+  return (
+    <svg
+      className="h-4.5 w-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+      />
+    </svg>
+  );
+}
+
+function KeyIcon() {
+  return (
+    <svg
+      className="h-4.5 w-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912l-1.66 1.66a2.25 2.25 0 0 1-1.591.659h-1.22v1.22a2.25 2.25 0 0 1-.659 1.59l-.621.622a2.25 2.25 0 0 1-1.591.659H3.75a1.5 1.5 0 0 1-1.5-1.5v-1.629c0-.597.237-1.169.659-1.591l6.899-6.899A6 6 0 1 1 21.75 8.25Z"
+      />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg
+      className="h-4.5 w-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3.75v10.5m0 0 3.75-3.75M12 14.25 8.25 10.5M3.75 16.5v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5"
+      />
     </svg>
   );
 }

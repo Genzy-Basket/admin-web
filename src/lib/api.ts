@@ -77,8 +77,65 @@ async function request<T>(
   return body.data;
 }
 
+// fetch() cannot report upload progress, and an APK upload is large enough
+// that a silent form invites double submits. XHR is the only browser API that
+// exposes it, so uploads take this path instead of request().
+function upload<T>(
+  path: string,
+  form: FormData,
+  onProgress?: (percent: number) => void,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const token = tokenStore.get();
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("POST", `${BASE_URL}${path}`);
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        onProgress?.(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      let body: ApiEnvelope<T> | null = null;
+      try {
+        body = JSON.parse(xhr.responseText) as ApiEnvelope<T>;
+      } catch {
+        // Fall through to the error below.
+      }
+
+      if (xhr.status >= 200 && xhr.status < 300 && body?.success) {
+        resolve(body.data);
+        return;
+      }
+
+      if (xhr.status === 401 && token) {
+        tokenStore.clear();
+        onUnauthorized?.();
+      }
+
+      reject(
+        new ApiError(
+          body?.message ?? "Upload failed. Please try again.",
+          xhr.status,
+          body?.error?.code,
+        ),
+      );
+    };
+
+    xhr.onerror = () =>
+      reject(new ApiError("Network error during upload.", 0));
+    xhr.onabort = () => reject(new ApiError("Upload cancelled.", 0));
+
+    xhr.send(form);
+  });
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
+  upload,
   post: <T>(path: string, payload?: unknown) =>
     request<T>(path, {
       method: "POST",
@@ -89,4 +146,5 @@ export const api = {
       method: "PATCH",
       body: payload ? JSON.stringify(payload) : undefined,
     }),
+  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };
