@@ -17,8 +17,6 @@ export default function OtpsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Codes expire in five minutes, so the countdown has to tick on its own
-  // rather than only moving when the list is refetched.
   const [now, setNow] = useState(() => Date.now());
 
   const load = useCallback(async (search: string, showSpinner: boolean) => {
@@ -40,13 +38,9 @@ export default function OtpsPage() {
       data === null ? 0 : SEARCH_DEBOUNCE_MS,
     );
     return () => clearTimeout(timer);
-    // `data` is deliberately absent: including it would re-run this on every
-    // fetch and turn the debounce into a refetch loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phone, load]);
 
-  // Poll quietly in the background so a code issued while support is on the
-  // phone shows up without anyone reaching for a refresh button.
   const phoneRef = useRef(phone);
   phoneRef.current = phone;
 
@@ -130,10 +124,7 @@ function OtpCard({ otp, now }: { otp: PartnerOtp; now: number }) {
       await navigator.clipboard.writeText(otp.otp);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 1500);
-    } catch {
-      // Clipboard is blocked outside a secure context; the code is on screen
-      // to read out anyway, so there is nothing useful to say here.
-    }
+    } catch {}
   };
 
   return (
