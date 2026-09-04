@@ -1,5 +1,8 @@
 # Logs
-logs
+# Anchored: a bare "logs" also matched src/features/logs, so the whole error
+# log feature was silently left out of a commit and the build failed on the
+# missing module.
+/logs
 *.log
 npm-debug.log*
 yarn-debug.log*
