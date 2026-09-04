@@ -9,6 +9,4 @@ export interface AuthContextValue {
   logout: () => void;
 }
 
-// Kept apart from AuthProvider so that file only exports a component and
-// Vite's fast refresh keeps working.
 export const AuthContext = createContext<AuthContextValue | null>(null);
