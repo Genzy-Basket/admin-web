@@ -4,6 +4,7 @@ import {
   canManageLegal,
   canPublishReleases,
   canViewLogs,
+  canViewOtps,
   LoginPage,
   useAuth,
 } from "@/features/auth";
@@ -13,6 +14,7 @@ import { PartnerDetailPage, PartnersPage } from "@/features/partners";
 import { ReleasesPage } from "@/features/releases";
 import { AdminsPage } from "@/features/admins";
 import { LogsPage } from "@/features/logs";
+import { OtpsPage } from "@/features/otps";
 import { LegalPage } from "@/features/legal";
 import AppLayout from "./AppLayout";
 
@@ -54,6 +56,7 @@ export default function AppRoutes() {
         {canManageLegal(admin) && (
           <Route path="legal" element={<LegalPage />} />
         )}
+        {canViewOtps(admin) && <Route path="otps" element={<OtpsPage />} />}
         {canViewLogs(admin) && <Route path="logs" element={<LogsPage />} />}
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

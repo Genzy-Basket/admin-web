@@ -9,7 +9,8 @@ export type AdminPermission =
   | "appRelease"
   | "notificationSend"
   | "legalManage"
-  | "logView";
+  | "logView"
+  | "otpView";
 
 export interface Admin {
   id: string;
@@ -66,3 +67,6 @@ export const canViewLogs = (admin: Admin | null) =>
 
 export const canManageLegal = (admin: Admin | null) =>
   admin?.permissions?.includes("legalManage") ?? false;
+
+export const canViewOtps = (admin: Admin | null) =>
+  admin?.permissions?.includes("otpView") ?? false;
